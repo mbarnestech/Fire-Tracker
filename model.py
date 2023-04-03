@@ -30,6 +30,7 @@ class Trail(db.Model):
     area = db.Column(db.String)
     subarea = db.Column(db.String)
     city = db.Column(db.String)
+    off_leash_dogs = db.Column(db.Boolean)
 
     trail_points = db.relationship('TrailPoint', back_populates='trail')
        
