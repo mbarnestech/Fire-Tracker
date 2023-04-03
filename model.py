@@ -1,7 +1,7 @@
 #import Python modules
 from flask_sqlalchemy import SQLAlchemy
 
-# create db instance from SQLALchemy
+# create db instance from SQLAlchemy
 db = SQLAlchemy()
 
 # create classes for each table
@@ -73,8 +73,8 @@ class Fire(db.Model):
         return f'<Fire id={self.fire_id} name={self.fire_name}>'
     
 
-# need to name psql database & replace <##########>
-def connect_to_db(flask_app, db_uri="postgresql:///<##########>", echo=True):
+#
+def connect_to_db(flask_app, db_uri="postgresql:///fire_tracker", echo=True):
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     flask_app.config["SQLALCHEMY_ECHO"] = echo
     flask_app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
