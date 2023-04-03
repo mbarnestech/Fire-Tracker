@@ -8,8 +8,8 @@ import model
 # create Flask app
 app = Flask(__name__)
 
-# Create secret key to use Flask session feature (generated using Bitwarden password manager)
-app.secret_key = '!H**R%jc2zGE7ULKmnVDGG4Bga943MzetKTrZir@rvahN%Km9K!k*x7xCVcgYciPRHS^$T'
+# Create secret key to use Flask session feature TODO - bring this in from a secrets file instead before deployment
+app.secret_key = 'I AM NOT A SECRET KEY YET, ANYONE CAN SEE ME ON GITHUB'
 
 # Make undefined variables throw an error in Jinja
 app.jinja_env.undefined = jinja2.StrictUndefined
