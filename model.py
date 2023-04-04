@@ -1,6 +1,7 @@
 #import Python modules
 from flask_sqlalchemy import SQLAlchemy
 
+
 # create db instance from SQLAlchemy
 db = SQLAlchemy()
 
@@ -12,7 +13,7 @@ class Trail(db.Model):
     __tablename__ = 'trails'
 
     trail_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String, nullable=False)
+    trail_name = db.Column(db.String, nullable=False)
     hp_id = db.Column(db.String, unique=True, nullable=False)  
     # gpx_url = db.Column(db.String, unique=True, nullable=False)
     # miles = db.Column(db.Float)
@@ -35,7 +36,7 @@ class Trail(db.Model):
     trail_points = db.relationship('TrailPoint', back_populates='trail')
        
     def __repr__(self):
-        return f'<Trail id={self.trail_id} email={self.email}>'
+        return f'<Trail id={self.trail_id} name={self.trail_name}>'
 
 
 class TrailPoint(db.Model):
@@ -44,7 +45,7 @@ class TrailPoint(db.Model):
     __tablename__ = 'trail_points'
     
     trail_point_id = db.Column(db.Integer, primary_key=True)
-    trail_id = db.Column(db.Integer, db.ForeignKey('Trail.trail_id'))
+    trail_id = db.Column(db.Integer, db.ForeignKey('trails.trail_id'))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
     # elevation = db.Column(db.Float)
@@ -74,7 +75,7 @@ class Fire(db.Model):
         return f'<Fire id={self.fire_id} name={self.fire_name}>'
     
 
-#
+
 def connect_to_db(flask_app, db_uri="postgresql:///fire_tracker", echo=True):
     flask_app.config["SQLALCHEMY_DATABASE_URI"] = db_uri
     flask_app.config["SQLALCHEMY_ECHO"] = echo
