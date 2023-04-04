@@ -15,23 +15,9 @@ class Trail(db.Model):
     trail_id = db.Column(db.Integer, primary_key=True)
     trail_name = db.Column(db.String, nullable=False)
     hp_id = db.Column(db.String, unique=True, nullable=False)  
-    # gpx_url = db.Column(db.String, unique=True, nullable=False)
-    # miles = db.Column(db.Float)
-    # high_elevation = db.Column(db.Integer)
-    # low_elevation = db.Column(db.Integer)
-    # elevation_gain = db.Column(db.Integer)
-    # trail_type = db.Column(db.String)
-    # difficulty = db.Column(db.String)
-    # last_condition = db.Column(db.String)
-    # last_condition_update = db.Column(db.Date)
-    # last_condition_notes = db.Column(db.String)
-    # stars = db.Column(db.Float)
-    # votes = db.Column(db.String)
     state = db.Column(db.String)
     area = db.Column(db.String)
-    # subarea = db.Column(db.String)
     city = db.Column(db.String)
-    # dogs = db.Column(db.String)
 
     trail_points = db.relationship('TrailPoint', back_populates='trail')
        
@@ -48,7 +34,6 @@ class TrailPoint(db.Model):
     trail_id = db.Column(db.Integer, db.ForeignKey('trails.trail_id'))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
-    # elevation = db.Column(db.Float)
 
     trail = db.relationship('Trail', back_populates='trail_points')
 
