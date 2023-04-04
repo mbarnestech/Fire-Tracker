@@ -3,7 +3,7 @@ import os
 from datetime import datetime
 
 # import local modules
-from crud import create_trail, create_trail_point, create_fire
+import crud
 import model
 import server
 
@@ -34,7 +34,7 @@ trails = [{'name': 'Cochise Stronghold Trail #279',
 # Create function for seeding trail data
 def seed_trail(trail):
    """for a given trail, create Trail instance and add it to the db session"""
-   model.db.session.add(create_trail(trail['name'], 
+   model.db.session.add(crud.create_trail(trail['name'], 
                                trail['hp_id'],
                                trail['state'], 
                                trail['area'],
@@ -71,7 +71,7 @@ trail_points = [{'trail': cochise,
 # Create function for seeding trail point data
 def seed_trail_point(trail_point):
    """for a given trail, create Trail instance and add it to the db session"""
-   model.db.session.add(create_trail_point(trail_point['trail'], 
+   model.db.session.add(crud.create_trail_point(trail_point['trail'], 
                                trail_point['latitude'],
                                trail_point['longitude']
                                ))
@@ -111,7 +111,7 @@ fires = [{'fire_url': 'https://inciweb.wildfire.gov/incident-information/copsf-4
 # Create function for seeding fire data
 def seed_fire(fire):
    """for a given trail, create Trail instance and add it to the db session"""
-   model.db.session.add(create_fire(fire['fire_url'],
+   model.db.session.add(crud.create_fire(fire['fire_url'],
                               fire['fire_name'],
                               fire['latitude'],
                               fire['longitude'],
