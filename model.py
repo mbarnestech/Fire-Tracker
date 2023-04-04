@@ -45,8 +45,8 @@ class TrailPoint(db.Model):
     
     trail_point_id = db.Column(db.Integer, primary_key=True)
     trail_id = db.Column(db.Integer, db.ForeignKey('Trail.trail_id'))
-    latitude = db.Column(db.String)
-    longitude = db.Column(db.String)
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
     # elevation = db.Column(db.Float)
 
     trail = db.relationship('Trail', back_populates='trail_points')
