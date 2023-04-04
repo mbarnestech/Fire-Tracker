@@ -2,14 +2,15 @@
 from datetime import datetime
 
 # import local modules
-from model import db, Trail, TrailPoint, Fire, connect_to_db
+from model import Trail, TrailPoint, Fire, connect_to_db, db
 
 
 # CRUD functions
+
 # def create_trail(name, trail_url, gpx_url, miles, high_elevation, low_elevation, elevation_gain, trail_type, difficulty, last_condition, last_condition_update, last_condition_notes, stars, votes, state, area, subarea, city, dogs):
-def create_trail(name, hp_id, state, area, city):
+def create_trail(trail_name, hp_id, state, area, city):
     """Create and return a new trail."""
-    return Trail(name=name, hp_id=hp_id, state=state, area=area, city=city)
+    return Trail(trail_name=trail_name, hp_id=hp_id, state=state, area=area, city=city)
 
 
 def create_trail_point(trail, latitude, longitude):
