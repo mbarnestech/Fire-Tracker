@@ -10,7 +10,7 @@ import crud
 app = Flask(__name__)
 
 # Create secret key to use Flask session feature TODO - bring this in from a secrets file instead before deployment
-app.secret_key = 'I AM NOT A SECRET KEY YET, ANYONE CAN SEE ME ON GITHUB'
+app.secret_key = 'I AM NOT A SECRET KEY YET; ANYONE CAN SEE ME ON GITHUB'
 
 # Make undefined variables throw an error in Jinja
 app.jinja_env.undefined = jinja2.StrictUndefined
