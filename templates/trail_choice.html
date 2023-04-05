@@ -1,5 +1,23 @@
 {% extends 'base.html' %}
 
-{% block content %} <h1> This is your trail: {{trail}}</h1> 
+{% block content %} 
+<h1> This is your trail:</h1> 
+<h2>{{ trail }}</h2>
+
+<form name="fire-check-form" action="/fire_check">
+    <fieldset>
+        <legend>Fire Distance</legend>
+        <label for="fire-distance"> How many miles from {{ trail }} do you want to check for fires?</label>
+        <input type="text" name="fire-distance" id="fire-distance" placeholder="50">
+    </fieldset>
+    <fieldset>
+        <legend>Submit</legend>
+        <input type = 'submit'>
+    </fieldset>
+</form>
+
+
+
+
 
 {% endblock %}
