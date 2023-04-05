@@ -1,3 +1,19 @@
 {% extends 'base.html' %}
 
-{% block content %} <h1> Welcome to my project. </h1> {% endblock %}
+{% block content %} <h1> Welcome to my project. </h1> 
+
+<form name="trail-form" action="/choose_trail">
+    <fieldset>
+        <legend>Choose a Trail</legend>
+        <select>
+        {% for trail in trails%}
+            <option value = '{{trail.trail_name}}'>{{trail.trail_name}}</option>
+        {% endfor %}
+        </select>
+    </fieldset>
+    <fieldset>
+        <legend>Submit</legend>
+        <input type = 'submit'>
+    </fieldset>
+</form>
+{% endblock %}
