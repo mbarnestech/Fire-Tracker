@@ -3,7 +3,7 @@ from flask import Flask, render_template, redirect, flash, session
 import jinja2
 
 # import local modules
-from model import connect_to_db, db
+from model import connect_to_db, db, Trail, TrailPoint, Fire
 import crud
 
 # create Flask app
@@ -22,8 +22,8 @@ app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = True
 @app.route("/")
 def index():
     """Return index."""
-
-    return render_template("index.html")
+    trails = Trail.query.all()
+    return render_template("index.html", trails=trails)
 
 
 # when this file is run
