@@ -1,5 +1,5 @@
 # import Python modules
-from flask import Flask, render_template, redirect, flash, session
+from flask import Flask, render_template, redirect, flash, session, request
 import jinja2
 
 # import local modules
@@ -25,6 +25,11 @@ def index():
     trails = Trail.query.all()
     return render_template("index.html", trails=trails)
 
+@app.route("/choose_trail")
+def choose_trail():
+    """Show fires near chosen trail"""
+    session['trail'] = request.args.get('trail-choice')
+    return render_template('trail_choice.html', trail = session['trail'])
 
 # when this file is run
 if __name__ == "__main__":

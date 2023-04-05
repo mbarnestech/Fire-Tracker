@@ -5,7 +5,7 @@
 <form name="trail-form" action="/choose_trail">
     <fieldset>
         <legend>Choose a Trail</legend>
-        <select>
+        <select name="trail-choice">
         {% for trail in trails%}
             <option value = '{{trail.trail_name}}'>{{trail.trail_name}}</option>
         {% endfor %}
