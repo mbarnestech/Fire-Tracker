@@ -45,8 +45,13 @@ def check_for_fire():
     # get object for chosen trail
     # trail_object = Trail.query.filter_by(trail_id = session['trail_id']).one()
     # get list of trailpoints for chosen trail
+
+
+    # TODO: MOVE THIS TO CRUD FILE, MAKE A FUNCTION
     trailpoint_list = db.session.query(TrailPoint).filter(Trail.trail_id == session['trail_id']).all()
     
+    # TODO: helper function file
+
     # create function to get the maximum and minimum latitude and longitude of the trail
     def get_maxmin_latlong(points):
         max_lat = points[0].latitude
@@ -54,21 +59,23 @@ def check_for_fire():
         max_long = points[0].longitude
         min_long = max_long
         for point in points:
-            if point.latitude > max_lat:
-                max_lat = point.latitude
-            elif point.latitude < min_lat:
-                min_lat = point.latitude
-            if point.longitude > max_long:
-                max_long = point.longitude
-            elif point.longitude < min_long:
-                min_long = point.longitude
+        # if point.latitude > max_lat:
+            max_lat = max(point.latitude, max_lat)
+        # elif point.latitude < min_lat:
+            min_lat = min(point.latitude, min_lat)
+        # if point.longitude > max_long:
+            max_long = max(point.longitude, max_long)
+        # elif point.longitude < min_long:
+            min_long = min(point.longitude, min_long)
         return (min_lat, max_lat, min_long, max_long)
     
+
     # create variables for maximum and minimum longitude of the trail
     min_lat, max_lat, min_long, max_long = get_maxmin_latlong(trailpoint_list)
 
-    # get a list of fires
+    # TODO: function in crud get a list of fires  *** server should never directly talk to database.
     fires = Fire.query.all()
+
 
     # get set distance from trail (temporarily hardcoding 50 miles)
     miles = int(request.args.get('fire-distance'))
