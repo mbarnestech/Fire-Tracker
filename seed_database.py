@@ -7,6 +7,8 @@ import crud
 import model
 import server
 
+#---------------------------------------------------------------------#
+
 # delete fire_tracker db if it exists
 os.system('dropdb --if-exists fire_tracker')
 # create new fire_tracker db
@@ -17,6 +19,8 @@ os.system('createdb fire_tracker')
 model.connect_to_db(server.app)
 # add structure to database
 model.db.create_all()
+
+#---------------------------------------------------------------------#
 
 # Sample trail data (2 trails; real data from HikingProject.com, manually cleaned to conform to data types wanted)
 trails = [{'trail_name': 'Cochise Stronghold Trail #279', 
@@ -49,6 +53,7 @@ for trail in trails:
 
 # # save all db session data to database
 model.db.session.commit()
+
 
 # Create sample trail point data (3 trail points from each trail taken from gpx files)
 cochise = model.Trail.query.filter_by(hp_id = '7030929').one()

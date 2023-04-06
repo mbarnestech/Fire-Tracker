@@ -4,7 +4,7 @@ from datetime import datetime
 # import local modules
 from model import Trail, TrailPoint, Fire, connect_to_db, db
 
-# CRUD functions
+#---------------------------------------------------------------------#
 
 # helper functions
 def create_decimal_latlong(latlong):
@@ -64,6 +64,8 @@ def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_up
 
     return Fire(fire_url=fire_url, fire_name=fire_name, latitude=decimal_latitude, longitude=decimal_longitude, incident_type=incident_type, last_updated=last_updated, size=size, contained=contained)
 
+
+#---------------------------------------------------------------------#
 
 # Connect to database when running crud.py interactively
 if __name__ == '__main__':
