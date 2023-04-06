@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %} 
-<h1> Fires near {{ session['trail']}}:</h1> 
+<h1> Fires near {{ session['trail_name'] }}:</h1> 
 {% if fires %}
-<ul>{% for fire in fires %}
 
+<ul>{% for fire in fires %}
     <li>{{ fire.fire_name }}</li>
     <li><a href='{{ fire.fire_url }}'/> Link to inciweb information on {{ fire.fire_name }}</a></li>
     {% endfor %}
@@ -12,7 +12,11 @@
 
 </ul>
 {% else %}
-<p>There are no fires near {{ session['trail']}}.</p>
+<p>There are no fires near {{ session['trail_name']}}.</p>
 {% endif %}
 
+
+<form action="/go_to_map">
+    <button name="Go to map" type="submit" value="Go to map">Go to map</button>
+</form>
 {% endblock %}

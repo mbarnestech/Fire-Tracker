@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1> Welcome to the map page!</h1>
+
+<p> Trailhead lat {{ trailhead.latitude }}</p>
+<p> Trailhead long {{ trailhead.longitude }}</p>
+
+<!-- <section class="map">
+<div id="map"></div>
+</section>
+
+<script src="/static/js/map.js"></script> -->
+<!-- TODO come back and add API key  -->
+<!--<script
+async
+src="https://maps.googleapis.com/maps/api/js?key=<MY API KEY>&callback=initMap">
+</script> -->
+  
+{% endblock %}

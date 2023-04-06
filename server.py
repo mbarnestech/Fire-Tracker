@@ -31,17 +31,21 @@ def index():
 @app.route("/choose_trail")
 def choose_trail():
     """Show chosen trail, ask for distance to check for fires"""
-    session['trail'] = request.args.get('trail-choice')
-    return render_template('trail_choice.html', trail = session['trail'])
+    session['trail_name'] = request.args.get('trail-choice')
+
+    trail = Trail.query.filter_by(trail_name = session['trail_name']).one()
+    session['trail_id'] = trail.trail_id
+
+    return render_template('trail_choice.html')
 
 @app.route("/fire_check")
 def check_for_fire():
     """Show whether fires exist within distance from trail"""
 
     # get object for chosen trail
-    trail_object = Trail.query.filter(Trail.trail_name == session['trail']).one()
+    # trail_object = Trail.query.filter_by(trail_id = session['trail_id']).one()
     # get list of trailpoints for chosen trail
-    trailpoint_list = TrailPoint.query.filter(TrailPoint.trail_id == trail_object.trail_id).all()
+    trailpoint_list = db.session.query(TrailPoint).filter(Trail.trail_id == session['trail_id']).all()
     
     # create function to get the maximum and minimum latitude and longitude of the trail
     def get_maxmin_latlong(points):
@@ -81,12 +85,22 @@ def check_for_fire():
     max_long += long_offset
 
     nearby_fires = []
+    session['fires'] = []
     # check for fires within range of offset
     for fire in fires:
         if min_lat < fire.latitude < max_lat and min_long < fire.longitude < max_long:
             nearby_fires.append(fire)
+            
 
     return render_template('nearby_fires.html', fires = nearby_fires)
+
+@app.route('/go_to_map')
+def go_to_map():
+    """Return map of trail and nearby fires"""
+
+    trailhead = db.session.query(TrailPoint).filter(Trail.trail_id == session['trail_id']).first()
+
+    return render_template('map.html', trailhead = trailhead)
 
 
 #---------------------------------------------------------------------#
