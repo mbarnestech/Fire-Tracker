@@ -36,7 +36,7 @@ def get_trail_with_trail_name(trail_name):
 
 def get_trailpoint_list_with_trail_id(trail_id):
     """return a list of TrailPoint objects corresponding to a trail id"""
-    return db.session.query(TrailPoint).filter(Trail.trail_id == trail_id).all()
+    return db.session.query(TrailPoint).filter(TrailPoint.trail_id == trail_id).all()
 
 def get_fires():
     """return a list of all Fire objects"""
