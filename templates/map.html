@@ -1,21 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-<h1> Welcome to the map page!</h1>
-
-<p> Trailhead lat {{ trailhead.latitude }}</p>
-<p> Trailhead long {{ trailhead.longitude }}</p>
-
-<!-- <section class="map-section">
-<div id="map"></div>
+<h1>Map of Trail and Fire</h1>
+<section class="map">
+<div id="map" style="width: 500px; height: 500px"></div>
 </section>
 
-<script src="/static/js/map.js"></script> -->
-<!-- TODO come back and add API key  -->
-<!--<script
-async
-src="https://maps.googleapis.com/maps/api/js?key=<MY API KEY>&callback=initMap">
-</script> -->
+<script src="/static/js/map.js"></script> 
+<!-- API key: AIzaSyAx-AR2twjiuf0BdT_K7vrLRKkhuLfXn7A -->
+
+<script
+async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAx-AR2twjiuf0BdT_K7vrLRKkhuLfXn7A&callback=initMap">
+</script>
   
 {% endblock %}
