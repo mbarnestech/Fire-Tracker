@@ -106,5 +106,9 @@ def get_nearby_fires(trailpoint_list, miles):
     # return list of Fire instances
     return nearby_fires
     
-
+def to_int(string_distance):
+    """return distance as an int; if none provided return 25"""
+    if string_distance:
+        return int(string_distance)
+    return 25
     
