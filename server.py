@@ -48,7 +48,7 @@ def check_for_fire():
     trailpoint_list = crud.get_trailpoint_list_with_trail_id(session['trail_id'])
 
     # get requested distance from trail in miles
-    miles = int(request.args.get('fire-distance'))
+    miles = helper.to_int(request.args.get('fire-distance'))
 
     # get list of Fire instances of nearby fires
     nearby_fires = helper.get_nearby_fires(trailpoint_list, miles)
@@ -59,9 +59,7 @@ def check_for_fire():
 def go_to_map():
     """Return map of trail and nearby fires"""
 
-    trailhead = db.session.query(TrailPoint).filter(Trail.trail_id == session['trail_id']).first()
-
-    return render_template('map.html', trailhead = trailhead)
+    return render_template('map.html')
 
 
 #---------------------------------------------------------------------#
