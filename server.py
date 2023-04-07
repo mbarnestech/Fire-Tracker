@@ -1,5 +1,5 @@
 # import Python modules
-from flask import Flask, render_template, redirect, flash, session, request
+from flask import Flask, render_template, redirect, flash, session, request, jsonify
 import jinja2
 
 # import local modules
@@ -30,34 +30,34 @@ def index():
     trails = crud.get_trails()
     return render_template("index.html", trails=trails)
 
-@app.route("/choose_trail")
+@app.route("/choose_trail", methods=['POST'])
 def choose_trail():
-    """Show chosen trail, ask for distance to check for fires"""
-    session['trail_name'] = request.args.get('trail-choice')
-
+    """Set session trail information"""
+    session['trail_name'] = request.json.get('trailChoice')
+    print(f"*********** {session['trail_name']=} ***********")
     trail = crud.get_trail_with_trail_name(session['trail_name'])
 
     session['trail_id'] = trail.trail_id
-
-    return render_template('trail_choice.html')
-
-@app.route("/fire_check")
-def check_for_fire():
-    """Show whether fires exist within distance from trail"""
-
+    print(f"*********** trail id: {session['trail_id']=}")
     # get list of TrailPoint objects corresponding to session trail_id
     trailpoint_list = crud.get_trailpoint_list_with_trail_id(session['trail_id'])
-
+    print(f'TRAILPOINTS = {trailpoint_list=}')
     # get requested distance from trail in miles
-    miles = helper.to_int(request.args.get('fire-distance'))
+    miles = helper.to_int(request.args.get('miles'))
 
     # get list of Fire instances of nearby fires
     nearby_fires = helper.get_nearby_fires(trailpoint_list, miles)
-
+    print(f'NEARBY FIRES CHECK: {nearby_fires}')
+    session['fires'] = []
+    print(f"*********** first: {session['fires']=}")
+    fire_dict = {}
+    for fire in nearby_fires:
+        fire_dict[fire.fire_name] = fire_dict.get(fire.fire_name, fire.fire_url)
     # add fire information to session
     session['fires'] = [fire.fire_id for fire in nearby_fires]
+    print(f"*********** second: {session['fires']=}")
 
-    return render_template('nearby_fires.html', fires = nearby_fires)
+    return jsonify(fire_dict)
 
 @app.route('/go_to_map')
 def go_to_map():

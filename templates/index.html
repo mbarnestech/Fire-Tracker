@@ -2,18 +2,29 @@
 
 {% block content %} <h1> Welcome to my project. </h1> 
 
-<form name="trail-form" action="/choose_trail">
+<form name="trail-form" id='trail-form' action="/choose_trail_and_distance">
     <fieldset>
         <legend>Choose a Trail</legend>
-        <select name="trail-choice">
+        <select name="trail-choice" id="trail-choice">
         {% for trail in trails%}
             <option value = '{{trail.trail_name}}'>{{trail.trail_name}}</option>
         {% endfor %}
         </select>
     </fieldset>
     <fieldset>
+        <legend>Fire Distance</legend>
+        <label for="fire-distance"> How many miles from {{ session['trail_name'] }} do you want to check for fires?</label>
+        <input type="text" name="fire-distance" id="fire-distance" placeholder="50">
+    </fieldset>
+    <fieldset>
         <legend>Submit</legend>
         <input type = 'submit'>
     </fieldset>
 </form>
+
+<section id="nearby-fires">
+    
+</section>
+
+<script src="static/js/main.js"></script>
 {% endblock %}
