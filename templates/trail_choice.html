@@ -4,7 +4,7 @@
 <h1> This is your trail:</h1> 
 <h2>{{ session['trail_name'] }}</h2>
 
-<form name="fire-check-form" action="/fire_check">
+<form id="fire-form" method='post' action="/fire_check">
     <fieldset>
         <legend>Fire Distance</legend>
         <label for="fire-distance"> How many miles from {{ session['trail_name'] }} do you want to check for fires?</label>

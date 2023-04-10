@@ -1,16 +1,38 @@
 {% extends 'base.html' %}
 
+{% block title%} Map of Trail and Fire {% endblock %}
+
+{% block scripts %} 
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script> 
+{% endblock %}
+
+
 {% block content %}
+
+<section id="trail-fire-info">
+{% if fires %}
+<h1> Fires near {{ session['trail_name'] }}:</h1> 
+<ul>{% for fire in fires %}
+    <li>{{ fire.fire_name }}</li>
+    <li><a href='{{ fire.fire_url }}'/> Link to inciweb information on {{ fire.fire_name }}</a></li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>There are no fires near {{ session['trail_name']}}.</p>
+{% endif %}
+</section>
+
+<section id="trail-fire-map">
 <h1>Map of Trail and Fire</h1>
 <section class="map">
 <div id="map" style="width: 500px; height: 500px"></div>
 </section>
+</section>
 
-<script src="/static/js/map.js"></script> 
-<!-- API key: AIzaSyAx-AR2twjiuf0BdT_K7vrLRKkhuLfXn7A -->
 
-<script
-async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAx-AR2twjiuf0BdT_K7vrLRKkhuLfXn7A&callback=initMap">
-</script>
+
+<script src="/static/js/mapbox.js"></script> 
+
   
 {% endblock %}
