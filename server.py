@@ -47,10 +47,9 @@ def choose_trail():
    
     # get list of TrailPoint objects corresponding to session trail_id
     trailpoint_list = crud.get_trailpoint_list_with_trail_id(session['trail_id'])
-    trailhead = trailpoint_list[0]
-    session['th_lat'] = trailhead.latitude
-    session['th_lng'] = trailhead.longitude
-    print(f"********** {session['th_lat']=}, {session['th_lng']=}")
+    # add list of [long, lat] pairs to session 
+    session['lnglat_list'] = helper.get_lnglat_list(trailpoint_list)
+
     # get requested distance from trail in miles
     miles = helper.to_int(session['miles'])
 
@@ -58,23 +57,16 @@ def choose_trail():
     nearby_fires = helper.get_nearby_fires(trailpoint_list, miles)
     
     # add fire information to session
-    session['fires'] = [fire.fire_id for fire in nearby_fires]
+    session['fires'] = [(fire.fire_id, fire.longitude, fire.latitude) for fire in nearby_fires]
 
     print(f"{session['trail_name']=}, {session['trail_id']=}, {session['miles']=}, {trailpoint_list=}, {session['fires']=}")
 
-    return render_template("map.html", fires=nearby_fires, th_lat = session['th_lat'], th_lng = session['th_lng'])
+    return render_template("map.html", fires=nearby_fires)
 
 @app.route('/testData')
 def giveMapBoxMapData():
-    dataForMap = {'thLat': session['th_lat'], 'thLng': session['th_lng'], 'mapKey': environ['DEFAULTMAPBOXTOKEN']}
+    dataForMap = {'lngLatList': session['lnglat_list'], 'fires': session['fires'], 'mapKey': environ['DEFAULTMAPBOXTOKEN']}
     return jsonify(dataForMap)
-
-@app.route('/go_to_map')
-def go_to_map():
-    """Return map of trail and nearby fires"""
-    trail = crud.get_trail_with_trail_name(session['trail_name'])
-    fires = crud.get_fires_with_fire_ids(session['fires'])
-    return render_template('map.html', trail=trail, fires = fires)
 
 
 #---------------------------------------------------------------------#

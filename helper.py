@@ -38,6 +38,12 @@ def get_maxmin_latlong(points):
         min_long = min(point.longitude, min_long)
     return (min_lat, max_lat, min_long, max_long)
 
+def get_lnglat_list(points):
+    lnglat_list = []
+    for point in points:
+        lnglat_list.append([point.longitude, point.latitude])
+    return lnglat_list
+
 
 def get_fires():
     """return a list of all Fire objects"""
