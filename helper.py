@@ -1,6 +1,7 @@
 """ file for helper functions """
 
 import crud
+import re
 
 def create_decimal_latlong(latlong):
     """change coordinates from sexagesimal string format to decimal float format
@@ -10,39 +11,16 @@ def create_decimal_latlong(latlong):
 
     # remove whitespace before and after
     latlong.strip()
-    # create string to move degrees to
-    decimal_string = ''
-    # set assumption of positive lat long
-    neg = False
-    # if lat long is negative
-    if latlong[0] == '-':
-        # set negative equal to true
-        neg = True
-        # remove first char, '-', from latlong string
-        latlong = latlong[1:]
-    # run while loop for first 2 or 3 numbers
-    while latlong[0].isnumeric():
-        # add the number to the decimal string
-        decimal_string += latlong[0]
-        # remove the number from the latlong string
-        latlong = latlong[1:]
-    # remove whitespace and . from latlong between degrees and minutes 
-    while not latlong[0].isnumeric():
-        latlong = latlong[1:]
-    # change the decimal_string to a float
-    decimal_latlong = float(decimal_string)
-    # the next two numbers in latlong are the minutes - divide by 60 and add to the float
-    decimal_latlong += float(latlong[:2]) / 60
-    # remove the minute numbers from latlong
-    latlong = latlong[2:]
-    # all the remaining numbers are the seconds - divide by 3600 and add to the float
-    decimal_latlong += float(latlong) / 3600
-    # if latlong was negative, make float negative as well
-    if neg == True:
+    # run regex on latlong to create neg, degrees, minutes, and seconds groups
+    latlong_groups = re.match(r"(?P<neg>-)?(?P<degrees>\d*) ?.(?P<minutes>\d{2})(?P<seconds>\d*.?\d*)", latlong)
+    # create decimal latlong -> deg + min/60 + sec/3600
+    decimal_latlong = int(latlong_groups['degrees']) + int(latlong_groups['minutes'])/60 + float(latlong_groups['seconds'])/3600
+    # if original latlong was negative, make decimal latlong negative as well
+    if latlong_groups.group('neg'):
         decimal_latlong *= -1
     # return decimal version of latlong
     return decimal_latlong
-
+    
 
 def get_maxmin_latlong(points):
     """get the maximum and minimum latitude and longitude of a trail
