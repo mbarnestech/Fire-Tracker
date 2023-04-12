@@ -37,19 +37,20 @@ trails = [{'trail_name': 'Cochise Stronghold Trail #279',
 
 
 # Create function for seeding trail data, commented out as db has this info
-def seed_trail(trail):
+def seed_trail(trails):
     """for a given trail, create Trail instance and add it to the db session"""
-    model.db.session.add(crud.create_trail(trail['trail_name'], 
-                                           trail['hp_id'],
-                                           trail['state'], 
-                                           trail['area'],
-                                           trail['city'] 
-                                           ))
+    
+    for trail in trails:
+        model.db.session.add(crud.create_trail(trail['trail_name'], 
+                                            trail['hp_id'],
+                                            trail['state'], 
+                                            trail['area'],
+                                            trail['city'] 
+                                            ))
 
 
 # # Populate session data with trails
-for trail in trails:
-    seed_trail(trail)
+seed_trail(trails)
 
 # # save all db session data to database
 model.db.session.commit()
