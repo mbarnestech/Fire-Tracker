@@ -12,17 +12,22 @@ function createMap(){
             zoom: 9 // starting zoom
             });
             
-            // Create fire features
+            /* ---------- CREATE POINT FEATURES ---------- */
+
+            // Create list of features
             geoJsonFeatures = []
+            // Add fire features only if fires were found in range
             if (data.fires.length > 0){
+                // loop through those fires
                 for (const fire of data.fires){
+                    // create one feature for each fire, changing description and coordinate with each
                     geoJsonFeatures.push(
                         {
                             'type': 'Feature',
                             'properties': {
                             'description': `<p>${fire[1]}</p>`,
                             // 'iconSize': [30, 30],
-                            'icon': 'fire-station'
+                            'icon': 'fire-station' // maki icon stylized for this map
                             },
                             'geometry': {
                             'type': 'Point',
@@ -32,13 +37,14 @@ function createMap(){
                     )
                 }
             };
+            // create a Trailhead feature at first long/lat trail point
             geoJsonFeatures.push(
                 {
                     'type': 'Feature',
                     'properties': {
                     'description': `<p>Trailhead</p>`,
                     // 'iconSize': [30, 30],
-                    'icon': 'parking'
+                    'icon': 'parking' // maki icon stylized for this map
                     },
                     'geometry': {
                     'type': 'Point',
@@ -46,7 +52,8 @@ function createMap(){
                     }
                 }
             )
-
+            
+            // include the above list of features when loading map
             map.on('load', () => {
                 map.addSource('places', {
                     'type': 'geojson',
@@ -56,48 +63,49 @@ function createMap(){
                     }
                 });
 
-            // Add a layer showing the places.
-            map.addLayer({
-                'id': 'places',
-                'type': 'symbol',
-                'source': 'places',
-                'layout': {
-                'icon-image': ['get', 'icon'],
-                'icon-allow-overlap': true
-                }
+                // Add a layer showing the places.
+                map.addLayer({
+                    'id': 'places',
+                    'type': 'symbol',
+                    'source': 'places',
+                    'layout': {
+                    'icon-image': ['get', 'icon'],
+                    'icon-allow-overlap': true
+                    }
                 });
 
-            // When a click event occurs on a feature in the places layer, open a popup at the
-            // location of the feature, with description HTML from its properties.
-            map.on('click', 'places', (e) => {
-                // Copy coordinates array.
-                const coordinates = e.features[0].geometry.coordinates.slice();
-                const description = e.features[0].properties.description;
-                
-                // Ensure that if the map is zoomed out such that multiple
-                // copies of the feature are visible, the popup appears
-                // over the copy being pointed to.
-                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
-                coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
-                }
-                
-                new mapboxgl.Popup()
-                .setLngLat(coordinates)
-                .setHTML(description)
-                .addTo(map);
-                });
-                
+                // When a click event occurs on a feature in the places layer, open a popup at the
+                // location of the feature, with description HTML from its properties.
+                map.on('click', 'places', (e) => {
+                    // Copy coordinates array.
+                    const coordinates = e.features[0].geometry.coordinates.slice();
+                    const description = e.features[0].properties.description;
+                    
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+                    
+                    new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                    });
+                    
                 // Change the cursor to a pointer when the mouse is over the places layer.
                 map.on('mouseenter', 'places', () => {
-                map.getCanvas().style.cursor = 'pointer';
-                });
+                    map.getCanvas().style.cursor = 'pointer';
+                    });
                 
                 // Change it back to a pointer when it leaves.
                 map.on('mouseleave', 'places', () => {
-                map.getCanvas().style.cursor = '';
-                });
+                    map.getCanvas().style.cursor = '';
+                    });
             });
 
+            /* ---------- CREATE TRAIL FEATURE ---------- */
 
             // create list of trail coordinates the map can use
             const coords = []
@@ -107,6 +115,7 @@ function createMap(){
             
             // create connected line of all trailpoint coordinates
             map.on('load', () => {
+                // adding the coordinates for the line to use
                 map.addSource('route', {
                 'type': 'geojson',
                 'data': {
@@ -118,6 +127,7 @@ function createMap(){
                 }
                 }
                 });
+                // adding the line itself
                 map.addLayer({
                 'id': 'route',
                 'type': 'line',
@@ -127,7 +137,7 @@ function createMap(){
                 'line-cap': 'round'
                 },
                 'paint': {
-                'line-color': '#F00',
+                'line-color': '#000',
                 'line-width': 1
                 }
                 });
@@ -136,4 +146,5 @@ function createMap(){
         });
 }
 
+// run above function
 createMap();
