@@ -57,7 +57,7 @@ def choose_trail():
     nearby_fires = helper.get_nearby_fires(trailpoint_list, miles)
     
     # add fire information to session
-    session['fires'] = [(fire.fire_id, fire.longitude, fire.latitude) for fire in nearby_fires]
+    session['fires'] = [[fire.fire_id, fire.fire_name, fire.longitude, fire.latitude] for fire in nearby_fires]
 
     print(f"{session['trail_name']=}, {session['trail_id']=}, {session['miles']=}, {trailpoint_list=}, {session['fires']=}")
 
@@ -65,6 +65,7 @@ def choose_trail():
 
 @app.route('/testData')
 def giveMapBoxMapData():
+    # struggling with how to route to .png image
     dataForMap = {'lngLatList': session['lnglat_list'], 'fires': session['fires'], 'mapKey': environ['DEFAULTMAPBOXTOKEN']}
     return jsonify(dataForMap)
 

@@ -7,6 +7,7 @@ from flask_sqlalchemy import SQLAlchemy
 db = SQLAlchemy()
 
 #---------------------------------------------------------------------#
+# NOTE look for cronjob for timing inciweb scraping
 
 class Trail(db.Model):
     """A trail, data from HikingProject.com."""
