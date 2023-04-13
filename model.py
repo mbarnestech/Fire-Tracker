@@ -9,19 +9,89 @@ db = SQLAlchemy()
 #---------------------------------------------------------------------#
 # NOTE look for cronjob for timing inciweb scraping
 
+class Region(db.Model):
+    """A US Forest Service Region
+    
+    Data from https://data-usfs.hub.arcgis.com/
+    Forest Service Regional Boundaries (Feature Layer).
+    """
+
+    __tablename__ = 'regions'
+
+    region_id = db.Column(db.String, primary_key=True)
+    region_name = db.Column(db.String, nullable = False)
+
+    forests = db.relationship('Forest', back_populates='region')
+    districts = db.relationship('District', back_populates='region')
+    trails = db.relationship('Trails', back_populates='region')
+
+    def __repr__(self):
+        return f'<Region id={self.region_id} name={self.region_name}>'
+
+
+class Forest(db.Model):
+    """A US Forest Service National Forest
+    
+    Data from https://data-usfs.hub.arcgis.com/
+    Forest Administrative Boundaries (Feature Layer).
+    """
+
+    __tablename__ = 'forests'
+
+    forest_id = db.Column(db.String, primary_key=True)
+    region_id = db.Column(db.String, db.ForeignKey('regions.region_id'))
+    forest_name = db.Column(db.String, nullable = False)
+
+    region = db.relationship('Region', back_populates='forests')
+    districts = db.relationship('District', back_populates='forest')
+    trails = db.relationship('Trails', back_populates='forest')
+
+    def __repr__(self):
+        return f'<Forest id={self.forest_id} name={self.forest_name}>'
+    
+
+class District(db.Model):
+    """A US Forest Service National Forest Ranger District
+    
+    Data from https://data-usfs.hub.arcgis.com/
+    Forest Administrative Boundaries (Feature Layer).
+    """
+
+    __tablename__ = 'districts'
+
+    district_id = db.Column(db.String, primary_key=True) 
+    region_id = db.Column(db.String, db.ForeignKey('regions.region_id'))  
+    forest_id = db.Column(db.String, db.ForeignKey('forests.forest_id')) 
+    district_name = db.Column(db.String, nullable = False)
+
+    region = db.relationship('Region', back_populates='districts')
+    forest = db.relationship('Forest', back_populates='districts')
+    trails = db.relationship('Trails', back_populates='district')
+
+    def __repr__(self):
+        return f'<District id={self.district_id} name={self.district_name}>'
+
+
 class Trail(db.Model):
-    """A trail, data from HikingProject.com."""
+    """A US Forest Service National Forest Trail
+    
+    Data from https://data-usfs.hub.arcgis.com/
+    National Forest System Trails (Feature Layer)    
+    """
 
     __tablename__ = 'trails'
 
-    trail_id = db.Column(db.Integer, primary_key=True)
+    trail_id = db.Column(db.String, primary_key=True)
+    trail_no = db.Column(db.String, nullable=False)
     trail_name = db.Column(db.String, nullable=False)
-    hp_id = db.Column(db.String, unique=True, nullable=False)  
-    state = db.Column(db.String)
-    area = db.Column(db.String)
-    city = db.Column(db.String)
+    region_id = db.Column(db.String, db.ForeignKey('regions.region_id'))  
+    forest_id = db.Column(db.String, db.ForeignKey('forests.forest_id'))  
+    district_id = db.Column(db.String, db.ForeignKey('districts.district_id'))  
 
     trail_points = db.relationship('TrailPoint', back_populates='trail')
+    region = db.relationship('Region', back_populates='trails')
+    forest = db.relationship('Forest', back_populates='trails')
+    district = db.relationship('District', back_populates='trails')
        
     def __repr__(self):
         return f'<Trail id={self.trail_id} name={self.trail_name}>'
@@ -33,7 +103,7 @@ class TrailPoint(db.Model):
     __tablename__ = 'trail_points'
     
     trail_point_id = db.Column(db.Integer, primary_key=True)
-    trail_id = db.Column(db.Integer, db.ForeignKey('trails.trail_id'))
+    trail_id = db.Column(db.String, db.ForeignKey('trails.trail_id'))
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
@@ -44,7 +114,9 @@ class TrailPoint(db.Model):
     
 
 class Fire(db.Model):
-    """A fire, data from inciweb.wildfire.gov."""
+    """A fire
+    
+    Data from inciweb.wildfire.gov."""
 
     __tablename__ = 'fires'
 
