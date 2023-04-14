@@ -11,13 +11,16 @@ def create_region(region_id, region_name):
     """Create and return a new region."""
     return Region(region_id=region_id, region_name=region_name)
 
+
 def create_forest(forest_id, forest_name, region):
     """Create and return a new forest."""
     return Forest(forest_id=forest_id, forest_name=forest_name, region=region)
 
+
 def create_district(district_id, district_name, region, forest):
     """Create and return a new district."""
     return District(district_id=district_id, district_name=district_name, region=region, forest=forest)
+
 
 def create_trail(trail_id, trail_no, trail_name, region, forest, district):
     """Create and return a new trail."""
@@ -67,6 +70,7 @@ def get_fires_with_fire_ids(fires):
     for fire in fires:
         fire_list.append(Fire.query.filter(Fire.fire_id == fire.fire_id).one())
     return fire_list
+
 
 #---------------------------------------------------------------------#
 
