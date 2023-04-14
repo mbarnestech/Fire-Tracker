@@ -22,17 +22,48 @@ def regenerate_db():
 
 #---------------------------------------------------------------------#
 
-def seed_regions(trail_regions):
+def seed_regions(regions):
     """for a given region, create Region instance and add it to the db session"""
-    for trail_point in trail_points:
-        model.db.session.add(crud.create_region(
-                                    region['region_id'], 
-                                    region['region_name'],
-                                    ))
+    
+    for region in regions:
+        if model.Region.query.filter_by(region_id = region['region_id']).first():
+            continue
+        model.db.session.add(crud.create_region(region['region_id'], 
+                                                region['region_name']
+                                                ))
         
-# TODO forest and region
-
     model.db.session.commit()
+
+
+def seed_forests(forests):
+    """for a given forest, create Forest instance and add it to the db session"""
+    for forest in forests:
+        if model.Forest.query.filter_by(forest_id = forest['forest_id']).first():
+            continue
+        if forest['region_id'] != '03':
+            continue
+        model.db.session.add(crud.create_forest(forest['forest_id'], 
+                                                forest['forest_name'],
+                                                forest['region_id']
+                                                ))
+    model.db.session.commit()
+
+
+def seed_districts(districts):
+    """for a given district, create District instance and add it to the db session"""
+    for district in districts:
+        if model.District.query.filter_by(district_id = district['district_id']).first():
+            continue
+        if district['region_id'] != '03':
+            continue
+        model.db.session.add(crud.create_district(district['district_id'], 
+                                                  district['district_name'],
+                                                  district['region_id'],
+                                                  district['forest_id']
+                                                  ))
+        
+    model.db.session.commit()
+
 
 def seed_trails(trails):
     """for a given trail, create Trail instance and add it to the db session"""
@@ -41,12 +72,12 @@ def seed_trails(trails):
         if model.Trail.query.filter_by(trail_id = trail['trail_id']).first():
             continue
         model.db.session.add(crud.create_trail(
-                                            trail['trail_id']
-                                            trail['trail_no']
+                                            trail['trail_id'],
+                                            trail['trail_no'],
                                             trail['trail_name'], 
-                                            trail['region'],
-                                            trail['forest'], 
-                                            trail['district'],
+                                            trail['region_id'],
+                                            trail['forest_id'], 
+                                            trail['district_id']
                                             ))
     # commit to db
     model.db.session.commit()

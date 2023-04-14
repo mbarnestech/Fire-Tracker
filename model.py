@@ -23,7 +23,7 @@ class Region(db.Model):
 
     forests = db.relationship('Forest', back_populates='region')
     districts = db.relationship('District', back_populates='region')
-    trails = db.relationship('Trails', back_populates='region')
+    trails = db.relationship('Trail', back_populates='region')
 
     def __repr__(self):
         return f'<Region id={self.region_id} name={self.region_name}>'
@@ -44,7 +44,7 @@ class Forest(db.Model):
 
     region = db.relationship('Region', back_populates='forests')
     districts = db.relationship('District', back_populates='forest')
-    trails = db.relationship('Trails', back_populates='forest')
+    trails = db.relationship('Trail', back_populates='forest')
 
     def __repr__(self):
         return f'<Forest id={self.forest_id} name={self.forest_name}>'
@@ -66,7 +66,7 @@ class District(db.Model):
 
     region = db.relationship('Region', back_populates='districts')
     forest = db.relationship('Forest', back_populates='districts')
-    trails = db.relationship('Trails', back_populates='district')
+    trails = db.relationship('Trail', back_populates='district')
 
     def __repr__(self):
         return f'<District id={self.district_id} name={self.district_name}>'
