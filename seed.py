@@ -6,7 +6,7 @@ from datetime import datetime
 import crud
 import model
 import server
-
+import fs_data
 #---------------------------------------------------------------------#
 def regenerate_db():
     """run to delete fire_tracker db from system and replace with structure from model.py"""
@@ -22,18 +22,31 @@ def regenerate_db():
 
 #---------------------------------------------------------------------#
 
-# Create function for seeding trail data, commented out as db has this info
+def seed_regions(trail_regions):
+    """for a given region, create Region instance and add it to the db session"""
+    for trail_point in trail_points:
+        model.db.session.add(crud.create_region(
+                                    region['region_id'], 
+                                    region['region_name'],
+                                    ))
+        
+# TODO forest and region
+
+    model.db.session.commit()
+
 def seed_trails(trails):
     """for a given trail, create Trail instance and add it to the db session"""
     
     for trail in trails:
-        if model.Trail.query.filter_by(hp_id = trail['hp_id']).first():
+        if model.Trail.query.filter_by(trail_id = trail['trail_id']).first():
             continue
-        model.db.session.add(crud.create_trail(trail['trail_name'], 
-                                            trail['hp_id'],
-                                            trail['state'], 
-                                            trail['area'],
-                                            trail['city'] 
+        model.db.session.add(crud.create_trail(
+                                            trail['trail_id']
+                                            trail['trail_no']
+                                            trail['trail_name'], 
+                                            trail['region'],
+                                            trail['forest'], 
+                                            trail['district'],
                                             ))
     # commit to db
     model.db.session.commit()
@@ -41,7 +54,7 @@ def seed_trails(trails):
 
 # # Create function for seeding trail point data
 def seed_trail_points(trail_points):
-    """for a given trail, create Trail instance and add it to the db session"""
+    """for a given trail point, create TrailPoint instance and add it to the db session"""
     for trail_point in trail_points:
         model.db.session.add(crud.create_trail_point(trail_point['trail'], 
                                     trail_point['latitude'],
@@ -79,7 +92,7 @@ fires = [{'fire_url': 'https://inciweb.wildfire.gov/incident-information/copsf-4
 
 # # Create function for seeding fire data
 def seed_fires(fires):
-    """for a given trail, create Trail instance and add it to the db session"""
+    """for a given fire, create Fire instance and add it to the db session"""
     for fire in fires:
         model.db.session.add(crud.create_fire(fire['fire_url'],
                                     fire['fire_name'],
