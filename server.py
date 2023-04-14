@@ -19,7 +19,6 @@ load_dotenv()
 
 # Create secret key to use Flask session feature
 app.secret_key = environ['APPSECRETKEY']
-print(f'********{app.secret_key=}')
 
 # Make undefined variables throw an error in Jinja
 app.jinja_env.undefined = jinja2.StrictUndefined
