@@ -2,16 +2,26 @@
 from datetime import datetime
 
 # import local modules
-from model import Trail, TrailPoint, Fire, connect_to_db, db
+from model import Region, Forest, District, Trail, TrailPoint, Fire, connect_to_db, db
 import helper
 
 #---------------------------------------------------------------------#
 # functions to create class instances
+def create_region(region_id, region_name):
+    """Create and return a new region."""
+    return Region(region_id=region_id, region_name=region_name)
 
+def create_forest(forest_id, forest_name, region):
+    """Create and return a new forest."""
+    return Forest(forest_id=forest_id, forest_name=forest_name, region=region)
 
-def create_trail(trail_name, hp_id, state, area, city):
+def create_district(district_id, district_name, region, forest):
+    """Create and return a new district."""
+    return District(district_id=district_id, district_name=district_name, region=region, forest=forest)
+
+def create_trail(trail_id, trail_no, trail_name, region, forest, district):
     """Create and return a new trail."""
-    return Trail(trail_name=trail_name, hp_id=hp_id, state=state, area=area, city=city)
+    return Trail(trail_id=trail_id, trail_no=trail_no, trail_name=trail_name, region=region, forest=forest, district=district)
 
 
 def create_trail_point(trail, latitude, longitude):
