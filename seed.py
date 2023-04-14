@@ -6,35 +6,21 @@ from datetime import datetime
 import crud
 import model
 import server
-import trails
 
 #---------------------------------------------------------------------#
-# delete fire_tracker db if it exists
-os.system('dropdb --if-exists fire_tracker')
-# create new fire_tracker db
-os.system('createdb fire_tracker')
+def regenerate_db():
+    """run to delete fire_tracker db from system and replace with structure from model.py"""
 
-# connect to db
-# with server.app.app_context():
-model.connect_to_db(server.app)
-# add structure to database
-model.db.create_all()
+    # delete fire_tracker db if it exists
+    os.system('dropdb --if-exists fire_tracker')
+    # create new fire_tracker db
+    os.system('createdb fire_tracker')
+    # with server.app.app_context():
+    model.connect_to_db(server.app)
+    # add structure to database
+    model.db.create_all()
 
 #---------------------------------------------------------------------#
-
-# Sample trail data (2 trails; real data from HikingProject.com, manually cleaned to conform to data types wanted)
-trails_list = [{'trail_name': 'Cochise Stronghold Trail #279', 
-        'hp_id': '7030929', 
-        'state': 'AZ',
-        'area': 'Southern Arizona and Tucson',
-        'city': 'Saint David'},
-        {'trail_name': 'Roundup Ground Trail (T107)', 
-        'hp_id': '7025732',    
-        'state': 'NM',
-        'area': 'Southwestern New Mexico',
-        'city': 'Alamogordo'
-        }]
-
 
 # Create function for seeding trail data, commented out as db has this info
 def seed_trails(trails):
@@ -53,35 +39,6 @@ def seed_trails(trails):
     model.db.session.commit()
 
 
-# Populate session data with trails
-
-seed_trails(trails.trails)
-seed_trails(trails_list)
-
-
-# Create sample trail point data (3 trail points from each trail taken from gpx files)
-cochise = model.Trail.query.filter_by(hp_id = '7030929').one()
-roundup = model.Trail.query.filter_by(hp_id = '7025732').one()
-
-trail_points = [{'trail': cochise,
-                'latitude': 31.92212,
-                'longitude': -109.967257},
-                {'trail': cochise,
-                'latitude': 31.921998,
-                'longitude': -109.96714},
-                {'trail': cochise,
-                'latitude': 31.907548,
-                'longitude': -109.967176},
-                {'trail': roundup,
-                'latitude': 32.859774,
-                'longitude': -105.910034},
-                {'trail': roundup,
-                'latitude': 32.859147,
-                'longitude': -105.906862},
-                {'trail': roundup,
-                'latitude': 32.854016,
-                'longitude': -105.90229}]  
-
 # # Create function for seeding trail point data
 def seed_trail_points(trail_points):
     """for a given trail, create Trail instance and add it to the db session"""
@@ -92,12 +49,8 @@ def seed_trail_points(trail_points):
                                     ))
     model.db.session.commit()
 
-# Populate session data with trail points
-seed_trail_points(trail_points)
-
 
 # Sample fire data (3 most recent fires from inciweb_placemarks.kml)
-
 fires = [{'fire_url': 'https://inciweb.wildfire.gov/incident-information/copsf-403-fire', 
         'fire_name': '403 Fire', 
         'latitude': '38 .5212', 
@@ -137,7 +90,4 @@ def seed_fires(fires):
                                     fire['size'],
                                     fire['contained']
                                     ))
-        model.db.session.commit()
-
-# Populate session data with fires
-seed_fires(fires)
+    model.db.session.commit()
