@@ -71,6 +71,8 @@ def seed_trails(trails):
     for trail in trails:
         if model.Trail.query.filter_by(trail_id = trail['trail_id']).first():
             continue
+        if trail['region_id'] != '03':
+            continue
         model.db.session.add(crud.create_trail(
                                             trail['trail_id'],
                                             trail['trail_no'],
@@ -87,7 +89,7 @@ def seed_trails(trails):
 def seed_trail_points(trail_points):
     """for a given trail point, create TrailPoint instance and add it to the db session"""
     for trail_point in trail_points:
-        model.db.session.add(crud.create_trail_point(trail_point['trail'], 
+        model.db.session.add(crud.create_trail_point(trail_point['trail_id'], 
                                     trail_point['latitude'],
                                     trail_point['longitude']
                                     ))

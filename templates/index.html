@@ -1,33 +1,23 @@
 {% extends 'base.html' %}
 
-{% block content %} <h1> Welcome to my project. </h1> 
+{% block title%} Choose a Region {% endblock %}
 
-<section id='active-form'>
-    <form id='trail-form' method='post' action ='/choose_trail'>
-        <fieldset>
-            <legend>Choose a Trail</legend>
-            <select name="trail-choice" id="trail-choice">
-            {% for trail in trails%}
-                <option value = '{{trail.trail_name}}'>{{trail.trail_name}}</option>
-            {% endfor %}
-            </select>
-        </fieldset>
-        <fieldset>
-            <legend>Fire Range</legend>
-            <label for="fire-distance"> How many miles from the trail do you want to check for fires?</label>
-            <input type="text" name="fire-distance" id="fire-distance" placeholder="25">
-        </fieldset>
-        <fieldset>
-            <legend>Submit</legend>
-            <input type='submit'>
-        </fieldset>
-    </form>
-</section>
+{% block content %}
+
+<form id='region-form' method='post' action ='/choose_region'>
+    <fieldset id="region-fieldset">
+        <legend>This app is currently limited to Region 03, Southwestern Region</legend>
+        <select name="region-choice" id="region-choice">
+        {% for region in regions %}
+            <option value = '{{ region }}'>{{ region }}</option>
+        {% endfor %}
+        </select>
+    </fieldset>
+    <fieldset>
+        <legend>Submit</legend>
+        <input type='submit' value="Next">
+    </fieldset>
+</form>
 
 
-<section id="nearby-fires">
-
-</section>
-
-<script src="static/js/main.js"></script>
 {% endblock %}

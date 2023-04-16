@@ -33,13 +33,46 @@ app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = True
 @app.route("/")
 def index():
     """Return index."""
-    trails = crud.get_trails()
-    return render_template("index.html", trails=trails)
+
+    regions = crud.get_region_names()
+
+    return render_template("index.html", regions=regions)
+
+@app.route('/choose_region', methods=['POST'])
+def forest():
+    """Return forest form."""
+
+    region_name = request.form.get('region-choice')
+    forests = crud.get_forests_by_region_name(region_name)
+
+    return render_template("forest.html", region_name = region_name, forests=forests)
+
+@app.route('/choose_forest', methods=['POST'])
+def district():
+    """Return district form."""
+
+    forest_name = request.form.get('forest-choice')
+    districts = crud.get_districts_by_forest_name(forest_name)
+
+    return render_template("district.html", forest_name = forest_name, districts=districts)
+
+@app.route('/choose_district', methods=['POST'])
+def trail():
+    """Return trail form."""
+
+    district_name = request.form.get('district-choice')
+    trails = crud.get_trails_by_district_name(district_name)
+
+    return render_template("trail.html", district_name = district_name, trails=trails)
 
 @app.route("/choose_trail", methods=['POST'])
 def choose_trail():
-    """Set session trail information"""
-    session['trail_name'] = request.form.get('trail-choice')
+    trail_name = request.form.get('trail-choice')
+    session['trail_name'] = trail_name
+    return render_template("distance.html", trail_name = trail_name)
+
+@app.route("/choose_distance", methods=['POST'])
+def choose_distance():
     trail = crud.get_trail_with_trail_name(session['trail_name'])
     session['trail_id'] = trail.trail_id
     session['miles'] = request.form.get('fire-distance')
