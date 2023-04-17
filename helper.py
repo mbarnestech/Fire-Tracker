@@ -1,7 +1,7 @@
 """ file for helper functions """
 
 import crud
-import re
+
 
 def create_decimal_latlong(latlong):
     """change coordinates from sexagesimal string format to decimal float format
@@ -55,11 +55,6 @@ def get_lnglat_list(points):
     return lnglat_list
 
 
-def get_fires():
-    """return a list of all Fire objects"""
-    return Fire.query.all()
-
-
 def get_fire_search_boundaries(maxmin_latlong, miles):
     """return fire search boundaries """
     
@@ -105,4 +100,21 @@ def to_int(string_distance):
     if string_distance:
         return int(string_distance)
     return 25
-    
+
+def check_time():
+    from datetime import date
+    from dotenv import load_dotenv
+    from os import environ
+    load_dotenv()
+    current_day = date.today()
+    import_day = environ['IMPORTDAY']
+    old_day = date(int(import_day[6:]), int(import_day[3:5]), int(import_day[0:2]))
+    print(f'{current_day=}, {old_day=}')
+    # difference in days
+    difference = (current_day - old_day).days
+    print(difference)
+    if difference >= 1:
+        return True
+    return False
+
+
