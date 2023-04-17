@@ -8,15 +8,12 @@ def create_decimal_latlong(latlong):
     
     for use in instantiating Fire class, lat/long data from .kml file needs reformatting
     """
-
-    # remove whitespace before and after
-    latlong.strip()
-    # run regex on latlong to create neg, degrees, minutes, and seconds groups
-    latlong_groups = re.match(r"(?P<neg>-)?(?P<degrees>\d*) ?.(?P<minutes>\d{2})(?P<seconds>\d*.?\d*)", latlong)
+    neg, degrees, minutes, seconds = latlong
+    
     # create decimal latlong -> deg + min/60 + sec/3600
-    decimal_latlong = int(latlong_groups['degrees']) + int(latlong_groups['minutes'])/60 + float(latlong_groups['seconds'])/3600
+    decimal_latlong = int(degrees) + int(minutes)/60 + float(seconds)/3600
     # if original latlong was negative, make decimal latlong negative as well
-    if latlong_groups.group('neg'):
+    if neg:
         decimal_latlong *= -1
     # return decimal version of latlong
     return decimal_latlong
