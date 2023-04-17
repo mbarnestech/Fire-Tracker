@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title%} Choose a District {% endblock %}
+
+{% block content %}
+
+<h2> You have chosen the {{ forest_name }}. </h2>
+
+<form id='district-form' method='post' action ='/choose_district'>
+    <fieldset id="district-fieldset">
+        <legend>Choose a Ranger District</legend>
+        <select name="district-choice" id="district-choice">
+        {% for district in districts %}
+            <option value = '{{ district }}'>{{ district }}</option>
+        {% endfor %}
+        </select>
+    </fieldset>
+    <fieldset>
+        <legend>Submit</legend>
+        <input type='submit' value="Next">
+    </fieldset>
+</form>
+
+{% endblock %}
