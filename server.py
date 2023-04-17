@@ -34,6 +34,9 @@ app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = True
 def index():
     """Return index."""
 
+    if helper.fires_are_old():
+        crud.update_fires()
+        
     regions = crud.get_region_names()
 
     return render_template("index.html", regions=regions)

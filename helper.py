@@ -1,5 +1,5 @@
 """ file for helper functions """
-
+from datetime import date
 import crud
 
 
@@ -101,14 +101,18 @@ def to_int(string_distance):
         return int(string_distance)
     return 25
 
-def check_time():
-    from datetime import date
-    from dotenv import load_dotenv
-    from os import environ
-    load_dotenv()
+def get_str_from_date(day):
+    return day.strftime('%Y/%m/%d')
+
+def get_today_str():
+    return date.today().strftime('%Y/%m/%d')
+
+def get_date_from_str(day):
+    return date(int(day[:4]), int(day[5:7]), int(day[8:]))
+
+def fires_are_old():
     current_day = date.today()
-    import_day = environ['IMPORTDAY']
-    old_day = date(int(import_day[6:]), int(import_day[3:5]), int(import_day[0:2]))
+    old_day = get_date_from_str(crud.get_last_db_update())
     print(f'{current_day=}, {old_day=}')
     # difference in days
     difference = (current_day - old_day).days
@@ -116,5 +120,4 @@ def check_time():
     if difference >= 1:
         return True
     return False
-
 

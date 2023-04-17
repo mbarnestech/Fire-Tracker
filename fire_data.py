@@ -64,7 +64,8 @@ def get_fires():
                     'incident_type': incident_type, 
                     'last_updated': last_update, 
                     'size': None, # size and contained require second scrape; will not be in MVP
-                    'contained': None
+                    'contained': None,
+                    'db_updated': helper.get_today_str()
                     })
 
     return fires

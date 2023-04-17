@@ -34,10 +34,10 @@ def create_trail_point(trail_id, latitude, longitude):
     return TrailPoint(trail_id=trail_id, latitude=latitude, longitude=longitude)
 
 
-def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_updated, size, contained):
+def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_updated, size, contained, db_updated):
     """Create and return a new fire."""
 
-    return Fire(fire_url=fire_url, fire_name=fire_name, latitude=latitude, longitude=longitude, incident_type=incident_type, last_updated=last_updated, size=size, contained=contained)
+    return Fire(fire_url=fire_url, fire_name=fire_name, latitude=latitude, longitude=longitude, incident_type=incident_type, last_updated=last_updated, size=size, contained=contained, db_updated=db_updated)
 
 
 #---------------------------------------------------------------------#
@@ -88,6 +88,10 @@ def get_fires_with_fire_ids(fires):
         fire_list.append(Fire.query.filter(Fire.fire_id == fire.fire_id).one())
     return fire_list
 
+def get_last_db_update():
+    return db.session.query(Fire.db_updated).order_by(Fire.db_updated.desc()).first()[0]
+
+
 #---------------------------------------------------------------------#
 # UPDATE
 
@@ -98,18 +102,21 @@ def update_fires():
     
     for fire in fires:
         if Fire.query.filter_by(fire_url = fire['fire_url']).first():
-            Fire.query.filter_by(fire_url = fire['fire_url']).delete()
-            db.session.commit()
-        db.session.add(create_fire(
-            fire['fire_url'],
-            fire['fire_name'],
-            fire['latitude'],
-            fire['longitude'],
-            fire['incident_type'],
-            fire['last_updated'],
-            fire['size'],
-            fire['contained']
-            ))
+            fire_to_update = Fire.query.filter_by(fire_url = fire['fire_url']).first()
+            fire_to_update.last_updated = fire['last_updated']
+            fire_to_update.db_updated = fire['db_updated']
+        else:
+            db.session.add(create_fire(
+                fire['fire_url'],
+                fire['fire_name'],
+                fire['latitude'],
+                fire['longitude'],
+                fire['incident_type'],
+                fire['last_updated'],
+                fire['size'],
+                fire['contained'],
+                fire['db_updated']
+                ))
     db.session.commit()
     
 

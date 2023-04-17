@@ -129,6 +129,7 @@ class Fire(db.Model):
     last_updated = db.Column(db.String)
     size = db.Column(db.Integer)
     contained = db.Column(db.Integer)
+    db_updated = db.Column(db.String)
        
     def __repr__(self):
         return f'<Fire id={self.fire_id} name={self.fire_name}>'

@@ -94,32 +94,13 @@ def seed_trail_points(trail_points):
     model.db.session.commit()
 
 
-# Sample fire data (3 most recent fires from inciweb_placemarks.kml)
-# fires = [{'fire_url': 'https://inciweb.wildfire.gov/incident-information/copsf-403-fire', 
-#         'fire_name': '403 Fire', 
-#         'latitude': '38 .5212', 
-#         'longitude': '-105.2248', 
-#         'incident_type': 'Wildfire', 
-#         'last_update': datetime(2023, 4, 3), 
-#         'size': 1518, 
-#         'contained': 60}, 
-#         {'fire_url': 'https://inciweb.wildfire.gov/incident-information/aza3s-texas-summit-fire', 
-#         'fire_name': 'Texas Summit Fire', 
-#         'latitude': '32 .0313.4', 
-#         'longitude': '-110 .0454.1', 
-#         'incident_type': 'Wildfire', 
-#         'last_update': datetime(2023, 3, 31), 
-#         'size': 455, 
-#         'contained': 80},
-#         {'fire_url': 'https://inciweb.wildfire.gov/incident-information/wvmof-hopkins-knob-prescribed-burn', 
-#         'fire_name': 'Hopkins Knob Prescribed Burn', 
-#         'latitude': '37.5717', 
-#         'longitude': '-80.1455.6', 
-#         'incident_type': 'Prescribed Fire', 
-#         'last_update': datetime(2023, 3, 30), 
-#         'size': 837, 
-#         'contained': None 
-#         }]
+
+# replace fires table
+def replace_fires_table():
+    model.connect_to_db(server.app)
+    model.Fire.__table__.drop()
+    model.Fire.__table__.create()
+
 
 # # Create function for seeding fire data
 def seed_fires(fires):
