@@ -38,13 +38,19 @@ for item in items[:1]:
         last_update = 'unknown'
     
     # get lat/long
-    latlong_groups = re.findall(r"(?P<neg>-)?(?P<degrees>\d*)\°(?P<minutes>\d{2})\'(?P<seconds>\d*\.?\d*)", "Latitude: 39°57'0''  Longitude: -105°22'5'' " )
+    latlong_groups = re.findall(r"(?P<neg>-)?(?P<degrees>\d*)\°(?P<minutes>\d{2})\'(?P<seconds>\d*\.?\d*)", item.find('description').string )
     if latlong_groups[0] and latlong_groups[1]:
         latitude = helper.create_decimal_latlong(latlong_groups[0])
         longitude = helper.create_decimal_latlong(latlong_groups[1])
     else:
         print('no latlong group')
         continue
+
+    # get incident type
+
+    incident_type = re.search(r"(incident is )(.*)( and involves)", item.find('description').string)
+    if incident_type:
+        incident_type = incident_type.group(1)
 
     # append attribute dict to fires list
     fires.append({'fire_url':item.find('link').string, 
