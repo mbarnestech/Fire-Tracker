@@ -3,6 +3,8 @@
 # import local modules
 from model import Region, Forest, District, Trail, TrailPoint, Fire, db, connect_to_db
 import helper
+import fire_data
+
 
 #---------------------------------------------------------------------#
 # CREATE
@@ -86,6 +88,30 @@ def get_fires_with_fire_ids(fires):
         fire_list.append(Fire.query.filter(Fire.fire_id == fire.fire_id).one())
     return fire_list
 
+#---------------------------------------------------------------------#
+# UPDATE
+
+def update_fires():
+    from datetime import date
+
+    fires = fire_data.get_fires()
+    
+    for fire in fires:
+        if Fire.query.filter_by(fire_url = fire['fire_url']).first():
+            Fire.query.filter_by(fire_url = fire['fire_url']).delete()
+            db.session.commit()
+        db.session.add(create_fire(
+            fire['fire_url'],
+            fire['fire_name'],
+            fire['latitude'],
+            fire['longitude'],
+            fire['incident_type'],
+            fire['last_updated'],
+            fire['size'],
+            fire['contained']
+            ))
+    db.session.commit()
+    
 
 #---------------------------------------------------------------------#
 
