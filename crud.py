@@ -35,7 +35,7 @@ def create_trail_point(trail_id, latitude, longitude):
 def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_updated, size, contained):
     """Create and return a new fire."""
 
-    return Fire(fire_url=fire_url, fire_name=fire_name, latitude=decimal_latitude, longitude=decimal_longitude, incident_type=incident_type, last_updated=last_updated, size=size, contained=contained)
+    return Fire(fire_url=fire_url, fire_name=fire_name, latitude=latitude, longitude=longitude, incident_type=incident_type, last_updated=last_updated, size=size, contained=contained)
 
 
 #---------------------------------------------------------------------#
