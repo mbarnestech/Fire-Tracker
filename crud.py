@@ -118,6 +118,7 @@ def update_fires():
                 fire['db_updated']
                 ))
     db.session.commit()
+    print(f'******* FIRE TABLE UPDATED *******')
     
 
 #---------------------------------------------------------------------#
