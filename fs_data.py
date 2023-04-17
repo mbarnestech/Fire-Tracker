@@ -50,15 +50,13 @@ trail_file = 'seed_data/National_Forest_System_Trails_(Feature_Layer).geojson'
 def get_trails_trail_points_lists(trail_file):
     with open(trail_file) as file:
         trailset = geojson.load(file)
-        # print(trailset[0]['properties']['ADMIN_ORG'][0:2] == '03')
         trails = []
         trail_points = []
         for trail in trailset[:]:
             if (trail['properties']['ADMIN_ORG'] and 
                 trail['properties']['TRAIL_NAME'] and
                 trail['properties']['TRAIL_CN'] not in [trail['trail_id'] for trail in trails] and
-                len(trail['properties']['ADMIN_ORG']) == 6 and
-                trail['properties']['ADMIN_ORG'][:2] == '03' 
+                len(trail['properties']['ADMIN_ORG']) == 6
                 ):
                 trails.append({'trail_id': trail['properties']['TRAIL_CN'], 
                                'trail_no': trail['properties']['TRAIL_NO'], 

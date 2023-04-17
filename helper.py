@@ -10,14 +10,27 @@ def create_decimal_latlong(latlong):
     """
     neg, degrees, minutes, seconds = latlong
     
+    # check for seconds
+    if seconds:
+        seconds = float(seconds)
+    else:
+        seconds = 0
+        
     # create decimal latlong -> deg + min/60 + sec/3600
-    decimal_latlong = int(degrees) + int(minutes)/60 + float(seconds)/3600
+    decimal_latlong = int(degrees) + int(minutes)/60 + seconds/3600
     # if original latlong was negative, make decimal latlong negative as well
     if neg:
         decimal_latlong *= -1
     # return decimal version of latlong
     return decimal_latlong
     
+def get_latlong_float(latlong):
+    
+    neg, latlong_str, _ = latlong
+    latlong_float = float(latlong_str)
+    if neg:
+        latlong_float *= -1
+    return latlong_float
 
 def get_maxmin_latlong(points):
     """get the maximum and minimum latitude and longitude of a trail

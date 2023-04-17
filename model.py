@@ -126,7 +126,7 @@ class Fire(db.Model):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     incident_type = db.Column(db.String)
-    last_updated = db.Column(db.Date)
+    last_updated = db.Column(db.String)
     size = db.Column(db.Integer)
     contained = db.Column(db.Integer)
        
