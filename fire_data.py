@@ -10,7 +10,6 @@ import re
 #import local modules
 import helper
 
-
 def get_soup_from_inciweb(inciweb_url = 'https://inciweb.nwcg.gov/incidents/rss.xml'):
     """get xml from a website parsed by BeautifulSoup"""
     response = requests.get(inciweb_url)
@@ -23,7 +22,7 @@ def get_soup_from_file(text = 'seed_data/incidents.xml'):
 
 def get_fires():
     
-    soup = get_soup_from_file()
+    soup = get_soup_from_inciweb()
 
     fires = []
     items = soup.find_all('item')
