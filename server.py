@@ -36,6 +36,8 @@ def index():
 
     if helper.fires_are_old():
         crud.update_fires()
+    else:
+        print('+++++++++++ NO UPDATE NEEDED +++++++++++')
         
     regions = crud.get_region_names()
 
@@ -93,8 +95,6 @@ def choose_distance():
     
     # add fire information to session
     session['fires'] = [[fire.fire_id, fire.fire_name, fire.longitude, fire.latitude] for fire in nearby_fires]
-
-    print(f"{session['trail_name']=}, {session['trail_id']=}, {session['miles']=}, {trailpoint_list=}, {session['fires']=}")
 
     return render_template("map.html", fires=nearby_fires)
 
