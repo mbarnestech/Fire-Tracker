@@ -6,7 +6,7 @@
 
 <form id='region-form' method='post' action ='/choose_region'>
     <fieldset id="region-fieldset">
-        <legend>This app is currently limited to Region 03, Southwestern Region</legend>
+        <legend>Please pick a US Forest Service Region</legend>
         <select name="region-choice" id="region-choice">
         {% for region in regions %}
             <option value = '{{ region }}'>{{ region }}</option>

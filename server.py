@@ -49,17 +49,20 @@ def forest():
 
     region_name = request.form.get('region-choice')
     forests = crud.get_forests_by_region_name(region_name)
+    forest_list = helper.is_forest_empty(forests)
 
-    return render_template("forest.html", region_name = region_name, forests=forests)
+    return render_template("forest.html", region_name = region_name, forest_list=forest_list)
 
 @app.route('/choose_forest', methods=['POST'])
 def district():
     """Return district form."""
+    #TODO create if/else for if district has no trails to disable option
 
     forest_name = request.form.get('forest-choice')
     districts = crud.get_districts_by_forest_name(forest_name)
+    district_list = helper.is_district_empty(districts)
 
-    return render_template("district.html", forest_name = forest_name, districts=districts)
+    return render_template("district.html", forest_name = forest_name, district_list=district_list)
 
 @app.route('/choose_district', methods=['POST'])
 def trail():
@@ -67,8 +70,9 @@ def trail():
 
     district_name = request.form.get('district-choice')
     trails = crud.get_trails_by_district_name(district_name)
+    trail_list = helper.is_trail_empty(trails)
 
-    return render_template("trail.html", district_name = district_name, trails=trails)
+    return render_template("trail.html", district_name = district_name, trail_list=trail_list)
 
 @app.route("/choose_trail", methods=['POST'])
 def choose_trail():

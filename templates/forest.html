@@ -10,8 +10,12 @@
     <fieldset id="forest-fieldset">
         <legend>Choose a National Forest</legend>
         <select name="forest-choice" id="forest-choice">
-        {% for forest in forests %}
-            <option value = '{{ forest }}'>{{ forest }}</option>
+        {% for forest, is_empty in forest_list %}
+            {% if is_empty %}
+                <option value = '{{ forest }}' disabled>{{ forest }}</option>
+            {% else %}
+                <option value = '{{ forest }}'>{{ forest }}</option>
+            {% endif %}
         {% endfor %}
         </select>
     </fieldset>

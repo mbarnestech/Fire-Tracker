@@ -37,6 +37,8 @@ def get_maxmin_latlong(points):
     
     points is a list of TrailPoint objects
     """
+
+    # TODO try / except statement to make sure there are coords or 'if points'
     max_lat = points[0].latitude
     min_lat = max_lat
     max_long = points[0].longitude
@@ -120,4 +122,37 @@ def fires_are_old():
     if difference >= 1:
         return True
     return False
+
+
+def is_forest_empty(forests):
+    forest_list = []
+    for forest in forests:
+        trail = crud.get_first_trail_by_forest_name(forest)
+        if trail:
+            forest_list.append((forest, False))
+        else:
+            forest_list.append((forest, True))
+    return forest_list
+
+
+def is_district_empty(districts):
+    district_list = []
+    for district in districts:
+        trail = crud.get_first_trail_by_district_name(district)
+        if trail:
+            district_list.append((district, False))
+        else:
+            district_list.append((district, True))
+    return district_list
+
+
+def is_trail_empty(trails):
+    trail_list = []
+    for trail in trails:
+        trail_points = crud.get_th_with_trail_name(trail)
+        if trail_points:
+            trail_list.append((trail, False))
+        else:
+            trail_list.append((trail, True))
+    return trail_list
 

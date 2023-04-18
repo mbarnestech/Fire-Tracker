@@ -10,8 +10,12 @@
     <fieldset id="district-fieldset">
         <legend>Choose a Ranger District</legend>
         <select name="district-choice" id="district-choice">
-        {% for district in districts %}
-            <option value = '{{ district }}'>{{ district }}</option>
+        {% for district, is_empty in district_list %}
+            {% if is_empty %}
+                <option value = '{{ district }}' disabled>{{ district }}</option>
+            {% else %}
+                <option value = '{{ district }}'>{{ district }}</option>
+            {% endif %}
         {% endfor %}
         </select>
     </fieldset>

@@ -10,8 +10,12 @@
     <fieldset id="trail-fieldset">
         <legend>Choose a Trail</legend>
         <select name="trail-choice" id="trail-choice">
-        {% for trail in trails %}
-            <option value = '{{ trail }}'>{{ trail }}</option>
+        {% for trail, is_empty in trail_list %}
+            {% if is_empty %}
+                <option value = '{{ trail }}' disabled>{{ trail }}</option>
+            {% else %}
+                <option value = '{{ trail }}'>{{ trail }}</option>
+            {% endif %}
         {% endfor %}
         </select>
     </fieldset>
