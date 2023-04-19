@@ -47,7 +47,6 @@ def get_regions():
     """return a list of all Region objects"""
     return Region.query.all()
 
-
 def get_forests():
     """return a list of all Forest objects"""
     return Forest.query.all()
@@ -59,6 +58,15 @@ def get_fires():
 def get_region_names():
     """return a list of all region names"""
     return [region[0] for region in db.session.query(Region.region_name).all()]
+
+def get_forest_names():
+    return [forest[0] for forest in db.session.query(Forest.forest_name).all()]
+
+def get_district_names():
+    return [district[0] for district in db.session.query(District.district_name).all()]
+
+def get_trail_names():
+    return [trail[0] for trail in db.session.query(Trail.trail_name).all()]
 
 def get_forests_by_region_name(chosen_region_name):
     return [forest[0] for forest in db.session.query(Forest.forest_name).join(Region).filter(Region.region_name == chosen_region_name).all()]

@@ -39,9 +39,9 @@ def index():
     else:
         print('+++++++++++ NO UPDATE NEEDED +++++++++++')
         
-    regions = crud.get_region_names()
+    regions, forest_list, district_list, trail_list = helper.generate_index_lists()
 
-    return render_template("index.html", regions=regions)
+    return render_template("index.html", regions=regions, forest_list=forest_list, district_list=district_list, trail_list=trail_list)
 
 @app.route('/choose_region', methods=['POST'])
 def forest():
@@ -51,7 +51,7 @@ def forest():
     forests = crud.get_forests_by_region_name(region_name)
     forest_list = helper.is_forest_empty(forests)
 
-    return render_template("forest.html", region_name = region_name, forest_list=forest_list)
+    return jsonify({'region_name':region_name, 'forest_list': forest_list})
 
 @app.route('/choose_forest', methods=['POST'])
 def district():
@@ -62,7 +62,7 @@ def district():
     districts = crud.get_districts_by_forest_name(forest_name)
     district_list = helper.is_district_empty(districts)
 
-    return render_template("district.html", forest_name = forest_name, district_list=district_list)
+    return jsonify({'forest_name': forest_name, 'district_list': district_list})
 
 @app.route('/choose_district', methods=['POST'])
 def trail():

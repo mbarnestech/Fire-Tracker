@@ -156,3 +156,16 @@ def is_trail_empty(trails):
             trail_list.append((trail, True))
     return trail_list
 
+def generate_index_lists():
+    regions = crud.get_region_names()
+    forests = crud.get_forest_names()
+    districts = crud.get_district_names()
+    trails = crud.get_trail_names()
+    
+    forest_list = is_forest_empty(forests)
+    district_list = is_district_empty(districts)
+    trail_list = is_trail_empty(trails)
+
+
+    return [regions, forest_list, district_list, trail_list]
+
