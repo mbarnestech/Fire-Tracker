@@ -47,9 +47,17 @@ def get_regions():
     """return a list of all Region objects"""
     return Region.query.all()
 
+def get_districts():
+    """return a list of all District objects"""
+    return District.query.all()
+
 def get_forests():
     """return a list of all Forest objects"""
     return Forest.query.all()
+
+def get_trails():
+    """return a list of all Trail objects"""
+    return Trail.query.all()
 
 def get_fires():
     """return a list of all Fire objects"""
@@ -58,15 +66,6 @@ def get_fires():
 def get_region_names():
     """return a list of all region names"""
     return [region[0] for region in db.session.query(Region.region_name).all()]
-
-def get_forest_names():
-    return [forest[0] for forest in db.session.query(Forest.forest_name).all()]
-
-def get_district_names():
-    return [district[0] for district in db.session.query(District.district_name).all()]
-
-def get_trail_names():
-    return [trail[0] for trail in db.session.query(Trail.trail_name).all()]
 
 def get_forests_by_region_name(chosen_region_name):
     return [forest[0] for forest in db.session.query(Forest.forest_name).join(Region).filter(Region.region_name == chosen_region_name).all()]
@@ -95,14 +94,6 @@ def get_fires_with_fire_ids(fires):
 def get_last_db_update():
     return db.session.query(Fire.db_updated).order_by(Fire.db_updated.desc()).first()[0]
 
-def get_th_with_trail_name(the_trail_name):
-    return db.session.query(TrailPoint.trail_id).join(Trail).filter(Trail.trail_name == the_trail_name).first()
-
-def get_first_trail_by_forest_name(forest):
-    return db.session.query(Trail.trail_id).join(Forest).filter(Forest.forest_name == forest).first()
-
-def get_first_trail_by_district_name(district):
-    return db.session.query(Trail.trail_id).join(District).filter(District.district_name == district).first()
 
 #---------------------------------------------------------------------#
 # UPDATE

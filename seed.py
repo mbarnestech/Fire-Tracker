@@ -44,7 +44,8 @@ def seed_forests(forests):
             continue
         model.db.session.add(crud.create_forest(forest['forest_id'], 
                                                 forest['forest_name'],
-                                                forest['region_id']
+                                                forest['region_id'],
+                                                forest['is_forest_empty']
                                                 ))
     model.db.session.commit()
 
@@ -57,7 +58,8 @@ def seed_districts(districts):
         model.db.session.add(crud.create_district(district['district_id'], 
                                                   district['district_name'],
                                                   district['region_id'],
-                                                  district['forest_id']
+                                                  district['forest_id'],
+                                                  district['is_district_empty']
                                                   ))
         
     model.db.session.commit()
@@ -76,7 +78,8 @@ def seed_trails(trails):
                                             trail['trail_name'], 
                                             trail['region_id'],
                                             trail['forest_id'], 
-                                            trail['district_id']
+                                            trail['district_id'],
+                                            trail['is_trail_empty']
                                             ))
     # commit to db
     model.db.session.commit()

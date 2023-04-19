@@ -39,8 +39,8 @@ def get_forests_districts_lists(forest_district_file):
             district_num = row['DISTRICTNUMBER']
             forest_id = region_id + forest_num
             district_id = forest_id + district_num            
-            forests.append({'forest_id': forest_id, 'region_id': region_id, 'forest_name': row['FORESTNAME']})
-            districts.append({'district_id': district_id, 'forest_id': forest_id, 'region_id': region_id, 'district_name': row['DISTRICTNAME']  })
+            forests.append({'forest_id': forest_id, 'region_id': region_id, 'forest_name': row['FORESTNAME'], 'is_forest_empty': False})
+            districts.append({'district_id': district_id, 'forest_id': forest_id, 'region_id': region_id, 'district_name': row['DISTRICTNAME'],'is_district_empty': False})
     return [forests, districts]
 
 # current location of FS Trails KML File
@@ -63,7 +63,8 @@ def get_trails_trail_points_lists(trail_file):
                                'trail_name': trail['properties']['TRAIL_NAME'], 
                                'region_id': trail['properties']['ADMIN_ORG'][:2], 
                                'forest_id': trail['properties']['ADMIN_ORG'][:4], 
-                               'district_id': trail['properties']['ADMIN_ORG']})
+                               'district_id': trail['properties']['ADMIN_ORG'],
+                               'is_trail_empty': False})
                 for coordinate in trail['geometry']['coordinates']:
                     if type(coordinate[0]) == float and type(coordinate[1]) == float:
                         trail_points.append({'trail_id': trail['properties']['TRAIL_CN'],
@@ -75,6 +76,31 @@ def get_trails_trail_points_lists(trail_file):
                         break
 
     return [trails, trail_points]
+
+def get_trails_only(trail_file):
+    with open(trail_file) as file:
+        trailset = geojson.load(file)
+        trails = []
+        for trail in trailset[:]:
+            if (trail['properties']['ADMIN_ORG'] and 
+                trail['properties']['TRAIL_NAME'] and
+                trail['properties']['TRAIL_CN'] not in [trail['trail_id'] for trail in trails] and
+                len(trail['properties']['ADMIN_ORG']) == 6
+                ):
+                trails.append({'trail_id': trail['properties']['TRAIL_CN'], 
+                               'trail_no': trail['properties']['TRAIL_NO'], 
+                               'trail_name': trail['properties']['TRAIL_NAME'], 
+                               'region_id': trail['properties']['ADMIN_ORG'][:2], 
+                               'forest_id': trail['properties']['ADMIN_ORG'][:4], 
+                               'district_id': trail['properties']['ADMIN_ORG'],
+                               'is_trail_empty': False})
+                for coordinate in trail['geometry']['coordinates']:
+                    if not (type(coordinate[0]) == float and type(coordinate[1]) == float):
+                        removed = trails.pop()
+                        print(f'***** REMOVED ****** {removed}{coordinate[0]=}{coordinate[1]=}')
+                        break
+
+    return trails
     
 
     

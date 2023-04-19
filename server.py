@@ -38,10 +38,18 @@ def index():
         crud.update_fires()
     else:
         print('+++++++++++ NO UPDATE NEEDED +++++++++++')
-        
-    regions, forest_list, district_list, trail_list = helper.generate_index_lists()
 
-    return render_template("index.html", regions=regions, forest_list=forest_list, district_list=district_list, trail_list=trail_list)
+    return render_template("index.html")
+
+
+@app.route("/initialize")
+def initialize_main():
+    """populate initial data"""
+
+    regions, forests, districts, trails = helper.generate_index_lists()
+
+    return jsonify({'regions': regions, 'forests': forests, 'districts': districts, 'trails': trails})
+
 
 @app.route('/choose_region', methods=['POST'])
 def forest():

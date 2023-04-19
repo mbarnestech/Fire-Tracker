@@ -124,48 +124,12 @@ def fires_are_old():
     return False
 
 
-def is_forest_empty(forests):
-    forest_list = []
-    for forest in forests:
-        trail = crud.get_first_trail_by_forest_name(forest)
-        if trail:
-            forest_list.append((forest, False))
-        else:
-            forest_list.append((forest, True))
-    return forest_list
-
-
-def is_district_empty(districts):
-    district_list = []
-    for district in districts:
-        trail = crud.get_first_trail_by_district_name(district)
-        if trail:
-            district_list.append((district, False))
-        else:
-            district_list.append((district, True))
-    return district_list
-
-
-def is_trail_empty(trails):
-    trail_list = []
-    for trail in trails:
-        trail_points = crud.get_th_with_trail_name(trail)
-        if trail_points:
-            trail_list.append((trail, False))
-        else:
-            trail_list.append((trail, True))
-    return trail_list
-
 def generate_index_lists():
     regions = crud.get_region_names()
-    forests = crud.get_forest_names()
-    districts = crud.get_district_names()
-    trails = crud.get_trail_names()
-    
-    forest_list = is_forest_empty(forests)
-    district_list = is_district_empty(districts)
-    trail_list = is_trail_empty(trails)
+    forests = [(forest.forest_name, forest.is_forest_empty) for forest in crud.get_forests()]
+    districts = [(district.district_name, district.is_district_empty) for district in crud.get_districts()]
+    trails = [(trail.trail_name, trail.is_trail_empty) for trail in crud.get_trails()]
 
 
-    return [regions, forest_list, district_list, trail_list]
+    return [regions, forests, districts, trails]
 

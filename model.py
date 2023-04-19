@@ -41,6 +41,7 @@ class Forest(db.Model):
     forest_id = db.Column(db.String, primary_key=True)
     region_id = db.Column(db.String, db.ForeignKey('regions.region_id'))
     forest_name = db.Column(db.String, nullable = False)
+    is_forest_empty = db.Column(db.Boolean, nullable = False)
 
     region = db.relationship('Region', back_populates='forests')
     districts = db.relationship('District', back_populates='forest')
@@ -63,6 +64,7 @@ class District(db.Model):
     region_id = db.Column(db.String, db.ForeignKey('regions.region_id'))  
     forest_id = db.Column(db.String, db.ForeignKey('forests.forest_id')) 
     district_name = db.Column(db.String, nullable = False)
+    is_district_empty = db.Column(db.Boolean, nullable = False)
 
     region = db.relationship('Region', back_populates='districts')
     forest = db.relationship('Forest', back_populates='districts')
@@ -86,7 +88,8 @@ class Trail(db.Model):
     trail_name = db.Column(db.String, nullable=False)
     region_id = db.Column(db.String, db.ForeignKey('regions.region_id'))  
     forest_id = db.Column(db.String, db.ForeignKey('forests.forest_id'))  
-    district_id = db.Column(db.String, db.ForeignKey('districts.district_id'))  
+    district_id = db.Column(db.String, db.ForeignKey('districts.district_id'))
+    is_trail_empty = db.Column(db.Boolean, nullable = False)  
 
     trail_points = db.relationship('TrailPoint', back_populates='trail')
     region = db.relationship('Region', back_populates='trails')
