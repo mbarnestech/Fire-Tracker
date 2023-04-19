@@ -9,48 +9,28 @@
         <legend>Please pick a US Forest Service Region</legend>
         <select name="region-choice" id="region-choice">
             <option value="" disabled selected>Choose a Region</option>
-        {% for region in regions %}
-            <option value = '{{ region }}'>{{ region }}</option>
-        {% endfor %}
+            <section id="regions"></section>
         </select>
     </fieldset>
     <fieldset id="forest-fieldset" class="hidden">
         <legend>Choose a National Forest</legend>
         <select name="forest-choice" id="forest-choice">
             <option value="" disabled selected>Choose a Forest</option>
-        {% for forest, is_empty in forest_list %}
-            {% if is_empty %}
-                <option value = '{{ forest }}' disabled>{{ forest }}</option>
-            {% else %}
-                <option value = '{{ forest }}'>{{ forest }}</option>
-            {% endif %}
-        {% endfor %}
+            <section id="forests"></section>
         </select>
     </fieldset>
     <fieldset id="district-fieldset">
         <legend>Choose a Ranger District</legend>
         <select name="district-choice" id="district-choice">
             <option value="" disabled selected>Choose a District</option>
-        {% for district, is_empty in district_list %}
-            {% if is_empty %}
-                <option value = '{{ district }}' disabled>{{ district }}</option>
-            {% else %}
-                <option value = '{{ district }}'>{{ district }}</option>
-            {% endif %}
-        {% endfor %}
+            <section id="districts"></section>
         </select>
     </fieldset>
     <fieldset id="trail-fieldset">
         <legend>Choose a Trail</legend>
         <select name="trail-choice" id="trail-choice">
             <option value="" disabled selected>Choose a Trail</option>
-        {% for trail, is_empty in trail_list %}
-            {% if is_empty %}
-                <option value = '{{ trail }}' disabled>{{ trail }}</option>
-            {% else %}
-                <option value = '{{ trail }}'>{{ trail }}</option>
-            {% endif %}
-        {% endfor %}
+            <section id="trails"></section>
         </select>
     </fieldset>
     <fieldset>
