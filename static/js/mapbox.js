@@ -1,5 +1,5 @@
 function createMap(){
-      fetch('/testData')
+      fetch('/mapData')
         .then((response)=>response.json())
         .then((data)=>{
             mapboxgl.accessToken = `${data.mapKey}`;

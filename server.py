@@ -102,7 +102,7 @@ def choose_distance():
 
     return render_template("map.html", fires=nearby_fires)
 
-@app.route('/testData')
+@app.route('/mapData')
 def giveMapBoxMapData():
     # struggling with how to route to .png image
     dataForMap = {'lngLatList': session['lnglat_list'], 'fires': session['fires'], 'mapKey': environ['DEFAULTMAPBOXTOKEN']}
