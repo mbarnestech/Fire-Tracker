@@ -24,10 +24,25 @@ class Region(db.Model):
     forests = db.relationship('Forest', back_populates='region')
     districts = db.relationship('District', back_populates='region')
     trails = db.relationship('Trail', back_populates='region')
+    region_coords = db.relationship('RegionCoord', back_populates='region')
 
     def __repr__(self):
         return f'<Region id={self.region_id} name={self.region_name}>'
 
+class RegionCoord(db.Model):
+    """Coordinates for a USFS Region"""
+
+    __tablename__ = 'region_coords'
+
+    coord_id = db.Column(db.Integer, primary_key=True)
+    region_id = db.Column(db.String, db.ForeignKey('regions.region_id'))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    region = db.relationship('Region', back_populates='region_coords')
+
+    def __repr__(self):
+        return f'<RegionCoord id={self.coord_id} region id={self.region_id}>'
 
 class Forest(db.Model):
     """A US Forest Service National Forest
@@ -46,10 +61,27 @@ class Forest(db.Model):
     region = db.relationship('Region', back_populates='forests')
     districts = db.relationship('District', back_populates='forest')
     trails = db.relationship('Trail', back_populates='forest')
+    forest_coords = db.relationship('ForestCoord', back_populates='forest')
 
     def __repr__(self):
         return f'<Forest id={self.forest_id} name={self.forest_name}>'
     
+
+class ForestCoord(db.Model):
+    """Coordinates for a USFS Forest"""
+
+    __tablename__ = 'forest_coords'
+
+    coord_id = db.Column(db.Integer, primary_key=True)
+    forest_id = db.Column(db.String, db.ForeignKey('forests.forest_id'))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    forest = db.relationship('Forest', back_populates='forest_coords')
+
+    def __repr__(self):
+        return f'<ForestCoord id={self.coord_id} forest id={self.forest_id}>'
+
 
 class District(db.Model):
     """A US Forest Service National Forest Ranger District
@@ -69,10 +101,27 @@ class District(db.Model):
     region = db.relationship('Region', back_populates='districts')
     forest = db.relationship('Forest', back_populates='districts')
     trails = db.relationship('Trail', back_populates='district')
+    district_coords = db.relationship('DistrictCoord', back_populates='district')
 
     def __repr__(self):
         return f'<District id={self.district_id} name={self.district_name}>'
 
+
+class DistrictCoord(db.Model):
+    """Coordinates for a USFS District"""
+
+    __tablename__ = 'district_coords'
+
+    coord_id = db.Column(db.Integer, primary_key=True)
+    district_id = db.Column(db.String, db.ForeignKey('districts.district_id'))
+    latitude = db.Column(db.Float)
+    longitude = db.Column(db.Float)
+
+    forest = db.relationship('District', back_populates='district_coords')
+
+    def __repr__(self):
+        return f'<DistrictCoord id={self.coord_id} district id={self.district_id}>'
+    
 
 class Trail(db.Model):
     """A US Forest Service National Forest Trail
