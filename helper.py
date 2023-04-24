@@ -124,12 +124,32 @@ def fires_are_old():
     return False
 
 
-def generate_index_lists():
-    regions = crud.get_region_names()
-    forests = [(forest.forest_name, forest.is_forest_empty) for forest in crud.get_forests()]
-    districts = [(district.district_name, district.is_district_empty) for district in crud.get_districts()]
-    trails = [(trail.trail_name, trail.is_trail_empty) for trail in crud.get_trails()]
+def generate_index_dict():
+    regions = [{'name': region.region_name, 'id': region.region_id} for region in crud.get_regions()]
+    forests = [{'name': forest.forest_name, 'isEmpty': forest.is_forest_empty, 'id': forest.forest_id} for forest in crud.get_forests()]
+    districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts()]
+    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails()]
+
+    return {'regions': regions, 'forests': forests, 'districts': districts, 'trails': trails}
 
 
-    return [regions, forests, districts, trails]
+def generate_region_dict(region_name):
+    forests = [{'name': forest.forest_name, 'isEmpty': forest.is_forest_empty, 'id': forest.forest_id} for forest in crud.get_forests_by_region(region_name)]
+    districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts_by_region(region_name)]
+    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_region(region_name)]
+
+    return {'forests': forests, 'districts': districts, 'trails': trails}
+
+
+def generate_forest_dict(forest_name):
+    districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts_by_forest(forest_name)]
+    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_forest(forest_name)]
+    print('GENERATING FOREST DICTIONARY YAYYYYYAYAYAYAYAYAYYA!')
+    return {'districts': districts, 'trails': trails}
+
+
+def generate_district_dict(district_name):
+    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_district(district_name)]
+
+    return {'trails': trails}
 

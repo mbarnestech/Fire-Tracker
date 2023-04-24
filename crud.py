@@ -43,6 +43,7 @@ def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_up
 #---------------------------------------------------------------------#
 # READ
 
+# Get whole tables
 def get_regions():
     """return a list of all Region objects"""
     return Region.query.all()
@@ -63,26 +64,35 @@ def get_fires():
     """return a list of all Fire objects"""
     return Fire.query.all()
 
-def get_region_names():
-    """return a list of all region names"""
-    return [region[0] for region in db.session.query(Region.region_name).all()]
+# Get tables by Region
 
-def get_forests_by_region_name(chosen_region_name):
-    return [forest[0] for forest in db.session.query(Forest.forest_name).join(Region).filter(Region.region_name == chosen_region_name).all()]
+def get_forests_by_region(region_name):
+    return Forest.query.join(Region).filter_by(region_name = region_name).all()
 
-def get_districts_by_forest_name(chosen_forest_name):
-    return [district[0] for district in db.session.query(District.district_name).join(Forest).filter(Forest.forest_name == chosen_forest_name).all()]
+def get_districts_by_region(region_name):
+    return District.query.join(Region).filter_by(region_name = region_name).all()
 
-def get_trails_by_district_name(chosen_district_name):
-    return [trail[0] for trail in db.session.query(Trail.trail_name).join(District).filter(District.district_name == chosen_district_name).all()]
+def get_trails_by_region(region_name):
+    return Trail.query.join(Region).filter_by(region_name = region_name).all()
 
-def get_trail_with_trail_name(trail_name):
-    """return single Trail instance with trail_name attribute"""
-    return Trail.query.filter_by(trail_name = trail_name).one()
+# Get tables by Forest
 
-def get_trailpoint_list_with_trail_id(trail_id):
+def get_districts_by_forest(forest_name):
+    return District.query.join(Forest).filter_by(forest_name = forest_name).all()
+
+def get_trails_by_forest(forest_name):
+    return Trail.query.join(Forest).filter_by(forest_name = forest_name).all()
+
+# Get tables by District
+
+def get_trails_by_district(district_name):
+    return Trail.query.join(District).filter_by(district_name = district_name).all()
+
+# For calculating distance from trail to fires
+
+def get_trailpoint_list_with_trail_name(trail_name):
     """return a list of TrailPoint objects corresponding to a trail id"""
-    return db.session.query(TrailPoint).filter(TrailPoint.trail_id == trail_id).all()
+    return db.session.query(TrailPoint).join(Trail).filter(Trail.trail_name == trail_name).all()
 
 def get_fires_with_fire_ids(fires):
     """get list of Fire objects corresponding to list of fire_id numbers"""
@@ -90,6 +100,18 @@ def get_fires_with_fire_ids(fires):
     for fire in fires:
         fire_list.append(Fire.query.filter(Fire.fire_id == fire.fire_id).one())
     return fire_list
+
+# Miscellaneous
+def get_trail_with_trail_name(trail_name):
+    """return single Trail instance with trail_name attribute"""
+    return Trail.query.filter_by(trail_name = trail_name).one()
+
+def get_region_names():
+    """return a list of all region names"""
+    return [region[0] for region in db.session.query(Region.region_name).all()]
+
+
+
 
 def get_last_db_update():
     return db.session.query(Fire.db_updated).order_by(Fire.db_updated.desc()).first()[0]

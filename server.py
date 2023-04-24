@@ -46,61 +46,51 @@ def index():
 def initialize_main():
     """populate initial data"""
 
-    regions, forests, districts, trails = helper.generate_index_lists()
+    index_dict = helper.generate_index_dict()
+    print('INITIALIZING' + '*' * 20)
+    return jsonify(index_dict)
 
-    return jsonify({'regions': regions, 'forests': forests, 'districts': districts, 'trails': trails})
+
+@app.route('/region')
+def set_region():
+
+    region_name = request.args.get('region')
+    region_dict = helper.generate_region_dict(region_name)
+    print('SETTING REGION' + '*' * 20)
+    return jsonify(region_dict)
 
 
-@app.route('/choose_region', methods=['POST'])
-def forest():
-    """Return forest form."""
+@app.route('/forest')
+def set_forest():
 
-    region_name = request.form.get('region-choice')
-    forests = crud.get_forests_by_region_name(region_name)
-    forest_list = helper.is_forest_empty(forests)
+    forest_name = request.args.get('forest')
+    forest_dict = helper.generate_forest_dict(forest_name)
+    print('SETTING FOREST' + '*' * 20)
+    print(forest_name, forest_dict)
+    return jsonify(forest_dict)
 
-    return jsonify({'region_name':region_name, 'forest_list': forest_list})
 
-@app.route('/choose_forest', methods=['POST'])
-def district():
-    """Return district form."""
-    #TODO create if/else for if district has no trails to disable option
+@app.route('/district')
+def set_district():
 
-    forest_name = request.form.get('forest-choice')
-    districts = crud.get_districts_by_forest_name(forest_name)
-    district_list = helper.is_district_empty(districts)
+    district_name = request.args.get('district')
+    district_dict = helper.generate_district_dict(district_name)
 
-    return jsonify({'forest_name': forest_name, 'district_list': district_list})
+    return jsonify(district_dict)
 
-@app.route('/choose_district', methods=['POST'])
-def trail():
-    """Return trail form."""
-
-    district_name = request.form.get('district-choice')
-    trails = crud.get_trails_by_district_name(district_name)
-    trail_list = helper.is_trail_empty(trails)
-
-    return render_template("trail.html", district_name = district_name, trail_list=trail_list)
-
-@app.route("/choose_trail", methods=['POST'])
-def choose_trail():
-    trail_name = request.form.get('trail-choice')
-    session['trail_name'] = trail_name
-    return render_template("distance.html", trail_name = trail_name)
 
 @app.route("/choose_distance", methods=['POST'])
 def choose_distance():
-    trail = crud.get_trail_with_trail_name(session['trail_name'])
-    session['trail_id'] = trail.trail_id
-    session['miles'] = request.form.get('fire-distance')
-   
-    # get list of TrailPoint objects corresponding to session trail_id
-    trailpoint_list = crud.get_trailpoint_list_with_trail_id(session['trail_id'])
-    # add list of [long, lat] pairs to session 
+
+    # get list of TrailPoint objects corresponding to chosen trail
+    trail_name = request.form.get('trail-choice')
+    trailpoint_list = crud.get_trailpoint_list_with_trail_name(trail_name)
+    # get list of lats and longs from 
     session['lnglat_list'] = helper.get_lnglat_list(trailpoint_list)
 
     # get requested distance from trail in miles
-    miles = helper.to_int(session['miles'])
+    miles = request.form.get('fire-distance')
+    miles = helper.to_int(miles)
 
     # get list of Fire instances of nearby fires
     nearby_fires = helper.get_nearby_fires(trailpoint_list, miles)
@@ -108,7 +98,7 @@ def choose_distance():
     # add fire information to session
     session['fires'] = [[fire.fire_id, fire.fire_name, fire.longitude, fire.latitude] for fire in nearby_fires]
 
-    return render_template("map.html", fires=nearby_fires)
+    return render_template("map.html", fires=nearby_fires, trail_name=trail_name)
 
 @app.route('/mapData')
 def giveMapBoxMapData():

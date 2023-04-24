@@ -4,33 +4,29 @@
 
 {% block content %}
 
-<form id='region-form' method='post' action ='/choose_region'>
+<form id='region-form' method='post' action ='/choose_distance'>
     <fieldset id="region-fieldset">
         <legend>Please pick a US Forest Service Region</legend>
         <select name="region-choice" id="region-choice">
             <option value="" disabled selected>Choose a Region</option>
-            <section id="regions"></section>
         </select>
     </fieldset>
     <fieldset id="forest-fieldset" class="hidden">
         <legend>Choose a National Forest</legend>
         <select name="forest-choice" id="forest-choice">
-            <option value="" disabled selected>Choose a Forest</option>
-            <section id="forests"></section>
+            <option value="" disabled selected>Choose a National Forest</option>
         </select>
     </fieldset>
     <fieldset id="district-fieldset">
         <legend>Choose a Ranger District</legend>
         <select name="district-choice" id="district-choice">
             <option value="" disabled selected>Choose a Ranger District</option>
-            <section id="districts"></section>
         </select>
     </fieldset>
     <fieldset id="trail-fieldset">
         <legend>Choose a Trail</legend>
         <select name="trail-choice" id="trail-choice">
             <option value="" disabled selected>Choose a Trail</option>
-            <section id="trails"></section>
         </select>
     </fieldset>
     <fieldset>
