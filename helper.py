@@ -3,6 +3,9 @@ from datetime import date
 import crud
 
 
+#---------------------------------------------------------------------#
+# FIRE_DATA.PY
+
 def create_decimal_latlong(latlong):
     """change coordinates from sexagesimal string format to decimal float format
     
@@ -25,12 +28,15 @@ def create_decimal_latlong(latlong):
     return decimal_latlong
     
 def get_latlong_float(latlong):
-    
+    """turn latlong list into float"""
     neg, latlong_str, _ = latlong
     latlong_float = float(latlong_str)
     if neg:
         latlong_float *= -1
     return latlong_float
+
+#---------------------------------------------------------------------#
+# SERVER.PY
 
 def get_maxmin_latlong(points):
     """get the maximum and minimum latitude and longitude of a trail
@@ -51,6 +57,7 @@ def get_maxmin_latlong(points):
     return (min_lat, max_lat, min_long, max_long)
 
 def get_lnglat_list(points):
+    """create a list of (longitude, latitude) tuples for a set of points"""
     lnglat_list = []
     for point in points:
         lnglat_list.append([point.longitude, point.latitude])
@@ -98,10 +105,15 @@ def get_nearby_fires(trailpoint_list, miles):
     return nearby_fires
     
 def to_int(string_distance):
-    """return distance as an int; if none provided return 25"""
-    if string_distance:
+    """return distance as int; return 25 if not possible"""
+    if string_distance.isdigit():
         return int(string_distance)
     return 25
+
+#---------------------------------------------------------------------#
+# SERVER.PY
+
+# for updating fire table
 
 def get_str_from_date(day):
     return day.strftime('%Y/%m/%d')
@@ -123,6 +135,7 @@ def fires_are_old():
         return True
     return False
 
+# for generating dictionaries for JS to fetch
 
 def generate_index_dict():
     regions = [{'name': region.region_name, 'id': region.region_id} for region in crud.get_regions()]
