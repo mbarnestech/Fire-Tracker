@@ -1,4 +1,4 @@
-"""get data from 3 files for region, forest and district, and trail data"""
+"""get data for region, forest and district, and trail data"""
 
 # import Python modules
 from csv import DictReader
@@ -12,6 +12,7 @@ from bs4 import BeautifulSoup
 # regions = fs_data.get_regions_list(fs_data.region_file)
 # forests, districts = fs_data.get_forests_districts_lists(fs_data.forest_district_file)
 # trails, trail_points = fs_data.get_trails_trail_points_lists(fs_data.trail_file)
+# coords = fs_data.get_region_coords()
 
 
 
@@ -44,11 +45,11 @@ def get_forests_districts_lists(forest_district_file):
             districts.append({'district_id': district_id, 'forest_id': forest_id, 'region_id': region_id, 'district_name': row['DISTRICTNAME'],'is_district_empty': False})
     return [forests, districts]
 
-# current location of FS Trails KML File
-
+# current location of FS Trails geojson File
 trail_file = 'seed_data/National_Forest_System_Trails_(Feature_Layer).geojson'
-# trails, trail_points = fs_data.get_trails_trail_points_lists(fs_data.trail_file)
+
 def get_trails_trail_points_lists(trail_file):
+    """get list for seeding both trails and trail points"""
     with open(trail_file) as file:
         trailset = geojson.load(file)
         trails = []
@@ -79,6 +80,7 @@ def get_trails_trail_points_lists(trail_file):
     return [trails, trail_points]
 
 def get_trails_only(trail_file):
+    """get list for seeding only trails"""
     with open(trail_file) as file:
         trailset = geojson.load(file)
         trails = []
@@ -103,14 +105,17 @@ def get_trails_only(trail_file):
 
     return trails
     
-def get_soup_from_file(xml_file):
-    """get xml from a file parsed by BeautifulSoup"""
-    with open(xml_file) as file:
+def get_soup_from_file(kml_file):
+    """get soup from kml file"""
+    with open(kml_file) as file:
         return BeautifulSoup(file, 'xml')
-    
-region_coord_file = 'seed_data/Forest_Service_Regional_Boundaries_(Feature_Layer).kml'
-def get_region_coords(region_coord_file=region_coord_file):
 
+# current location of regional boundaries kml file
+region_coord_file = 'seed_data/Forest_Service_Regional_Boundaries_(Feature_Layer).kml'
+
+def get_region_coords(region_coord_file=region_coord_file):
+    """get list of coordinate dictionaries for each region"""
+    
     soup = get_soup_from_file(region_coord_file)
 
     placemarks = soup.find_all('Placemark') 
