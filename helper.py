@@ -44,7 +44,6 @@ def get_maxmin_latlong(points):
     points is a list of TrailPoint objects
     """
 
-    # TODO try / except statement to make sure there are coords or 'if points'
     max_lat = points[0].latitude
     min_lat = max_lat
     max_long = points[0].longitude
