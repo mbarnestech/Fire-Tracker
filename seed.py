@@ -85,7 +85,6 @@ def seed_trails(trails):
     model.db.session.commit()
 
 
-# # Create function for seeding trail point data
 def seed_trail_points(trail_points):
     """for a given trail point, create TrailPoint instance and add it to the db session"""
     for trail_point in trail_points:
@@ -97,7 +96,6 @@ def seed_trail_points(trail_points):
     model.db.session.commit()
 
 
-# # Create functions for seeding fs map data
 def seed_region_coords(region_coords):
     """for a given region, create RegionCoord instance and add it to the db session"""
     for coord in region_coords:
@@ -129,15 +127,21 @@ def seed_district_coords(district_coords):
                                         ))
     model.db.session.commit()
 
-
-# replace fires table
-def replace_fires_table():
+def add_coord_tables():
+    """add District, Foreign, and Region Coordinate tables to db"""
     model.connect_to_db(server.app)
-    model.Fire.__table__.drop()
-    model.Fire.__table__.create()
+    model.DistrictCoord.__table__.create(model.db.engine)
+    model.ForestCoord.__table__.create(model.db.engine)
+    model.RegionCoord.__table__.create(model.db.engine)
 
 
-# # Create function for seeding fire data
+def replace_fires_table():
+    """replace fires table"""
+    model.connect_to_db(server.app)
+    model.Fire.__table__.drop(model.db.engine)
+    model.Fire.__table__.create(model.db.engine)
+
+
 def seed_fires(fires):
     """for a given fire, create Fire instance and add it to the db session"""
     for fire in fires:
