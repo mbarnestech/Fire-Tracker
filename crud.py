@@ -17,40 +17,32 @@ def create_region_coords(region_id, latitude, longitude):
     """Create and return a new region coordinate"""
     return RegionCoord(region_id=region_id, latitude=latitude, longitude=longitude)
 
-
 def create_forest(forest_id, forest_name, region_id):
     """Create and return a new forest."""
     return Forest(forest_id=forest_id, forest_name=forest_name, region_id=region_id)
-
 
 def create_forest_coords(forest_id, latitude, longitude):
     """Create and return a new forest coordinate"""
     return ForestCoord(forest_id=forest_id, latitude=latitude, longitude=longitude)
 
-
 def create_district(district_id, district_name, region_id, forest_id):
     """Create and return a new district."""
     return District(district_id=district_id, district_name=district_name, region_id=region_id, forest_id=forest_id)
-
 
 def create_district_coords(district_id, latitude, longitude):
     """Create and return a new district coordinate"""
     return DistrictCoord(district_id=district_id, latitude=latitude, longitude=longitude)
 
-
 def create_trail(trail_id, trail_no, trail_name, region_id, forest_id, district_id):
     """Create and return a new trail."""
     return Trail(trail_id=trail_id, trail_no=trail_no, trail_name=trail_name, region_id=region_id, forest_id=forest_id, district_id=district_id)
-
 
 def create_trail_point(trail_id, latitude, longitude):
     """Create and return a new trail point"""
     return TrailPoint(trail_id=trail_id, latitude=latitude, longitude=longitude)
 
-
 def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_updated, size, contained, db_updated):
     """Create and return a new fire."""
-
     return Fire(fire_url=fire_url, fire_name=fire_name, latitude=latitude, longitude=longitude, incident_type=incident_type, last_updated=last_updated, size=size, contained=contained, db_updated=db_updated)
 
 
@@ -182,6 +174,7 @@ def update_fires():
     print(f'******* FIRE TABLE UPDATED *******')
     
 def set_trails_to_empty():
+    """set trails with no associated trailpoints to empty"""
     trails = get_trail_ids()
     for trail in trails[:]:
         if trailpoint_in_trail(trail):
@@ -194,6 +187,7 @@ def set_trails_to_empty():
     print(f'******* TRAILS TABLE UPDATED *******')
     
 def set_districts_to_empty():
+    """set districts containing only empty trails to empty"""
     districts = get_district_ids()
     for district in districts[:]:
         if trail_in_district(district):
@@ -206,6 +200,7 @@ def set_districts_to_empty():
     print(f'******* DISTRICTS TABLE UPDATED *******')
 
 def set_forests_to_empty():
+    """set forests containing only empty districts to empty"""
     forests = get_forest_ids()
     for forest in forests[:]:
         if district_in_forest(forest):
