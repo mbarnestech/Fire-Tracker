@@ -122,7 +122,7 @@ def get_region_coords(region_coord_file=region_coord_file):
     region_coords = []       
     for placemark in placemarks[:]:
         coords = placemark.find('coordinates').string[:].split()
-        for coord in coords[:1]:
+        for coord in coords[:]:
             latitude, longitude = coord.split(',')
             region_coords.append({'region_id': placemark.select_one('[name="REGION"]').text,
                                   'latitude': float(latitude),
