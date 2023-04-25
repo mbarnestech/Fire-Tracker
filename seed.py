@@ -97,6 +97,38 @@ def seed_trail_points(trail_points):
     model.db.session.commit()
 
 
+# # Create functions for seeding fs map data
+def seed_region_coords(region_coords):
+    """for a given region, create RegionCoord instance and add it to the db session"""
+    for coord in region_coords:
+        model.db.session.add(crud.create_region_coords(coord['region_id'], 
+                                    coord['latitude'],
+                                    coord['longitude']
+                                    ))
+    model.db.session.commit()
+
+
+def seed_forest_coords(forest_coords):
+    """for a given forest, create ForestCoord instance and add it to the db session"""
+    for coord in forest_coords:
+        if crud.forest_not_empty(coord['forest_id']):
+            model.db.session.add(crud.create_forest_coords(coord['forest_id'], 
+                                        coord['latitude'],
+                                        coord['longitude']
+                                        ))
+    model.db.session.commit()
+
+
+def seed_district_coords(district_coords):
+    """for a given district, create DistrictCoord instance and add it to the db session"""
+    for coord in district_coords:
+        if crud.district_not_empty(coord['district_id']):
+            model.db.session.add(crud.create_district_coords(coord['district_id'], 
+                                        coord['latitude'],
+                                        coord['longitude']
+                                        ))
+    model.db.session.commit()
+
 
 # replace fires table
 def replace_fires_table():

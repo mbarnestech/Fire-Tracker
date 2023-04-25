@@ -4,6 +4,7 @@
 from csv import DictReader
 import geojson
 import re
+from bs4 import BeautifulSoup
 
 #---------------------------------------------------------------------#
 
@@ -102,5 +103,23 @@ def get_trails_only(trail_file):
 
     return trails
     
-
+def get_soup_from_file(xml_file):
+    """get xml from a file parsed by BeautifulSoup"""
+    with open(xml_file) as file:
+        return BeautifulSoup(file, 'xml')
     
+region_coord_file = 'seed_data/Forest_Service_Regional_Boundaries_(Feature_Layer).kml'
+def get_region_coords(region_coord_file=region_coord_file):
+
+    soup = get_soup_from_file(region_coord_file)
+
+    placemarks = soup.find_all('Placemark') 
+    region_coords = []       
+    for placemark in placemarks[:]:
+        coords = placemark.find('coordinates').string[:].split()
+        for coord in coords[:1]:
+            latitude, longitude = coord.split(',')
+            region_coords.append({'region_id': placemark.select_one('[name="REGION"]').text,
+                                  'latitude': float(latitude),
+                                  'longitude': float(longitude)})
+    return region_coords

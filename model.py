@@ -42,7 +42,7 @@ class RegionCoord(db.Model):
     region = db.relationship('Region', back_populates='region_coords')
 
     def __repr__(self):
-        return f'<RegionCoord id={self.coord_id} region id={self.region_id}>'
+        return f'<RegionCoord id={self.coord_id} region name={self.region_name}>'
 
 class Forest(db.Model):
     """A US Forest Service National Forest
@@ -117,7 +117,7 @@ class DistrictCoord(db.Model):
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
-    forest = db.relationship('District', back_populates='district_coords')
+    district = db.relationship('District', back_populates='district_coords')
 
     def __repr__(self):
         return f'<DistrictCoord id={self.coord_id} district id={self.district_id}>'

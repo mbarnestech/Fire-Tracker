@@ -102,7 +102,6 @@ def choose_distance():
 
 @app.route('/mapData')
 def giveMapBoxMapData():
-    # struggling with how to route to .png image
     dataForMap = {'lngLatList': session['lnglat_list'], 'fires': session['fires'], 'mapKey': environ['DEFAULTMAPBOXTOKEN']}
     return jsonify(dataForMap)
 
