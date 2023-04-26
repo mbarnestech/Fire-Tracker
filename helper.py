@@ -55,7 +55,7 @@ def get_maxmin_latlong(points):
         min_long = min(point.longitude, min_long)
     return (min_lat, max_lat, min_long, max_long)
 
-def get_lnglat_list(points):
+def get_lnglat_tuples(points):
     """create a list of (longitude, latitude) tuples for a set of points"""
     lnglat_list = []
     for point in points:
@@ -70,7 +70,6 @@ def get_fire_search_boundaries(maxmin_latlong, miles):
         # this is math based on numbers from 38 deg North latitude, which I'm calling close enough for my purposes here
     lat_offset = miles/69
     long_offset = miles/54.6
-    
     #unpack maxmin_latlong
     min_lat, max_lat, min_long, max_long = maxmin_latlong
     
@@ -85,7 +84,6 @@ def get_fire_search_boundaries(maxmin_latlong, miles):
 
 def get_nearby_fires(trailpoint_list, miles):
     """get list of Fire instances for fires within requested miles of trail"""
-
     # get maximum and minimum latitude and longitude of the trail
     maxmin_latlong = get_maxmin_latlong(trailpoint_list)
     # get maximum and minimum latitude and longitude for fire search
@@ -140,7 +138,7 @@ def generate_index_dict():
     regions = [{'name': region.region_name, 'id': region.region_id} for region in crud.get_regions()]
     forests = [{'name': forest.forest_name, 'isEmpty': forest.is_forest_empty, 'id': forest.forest_id} for forest in crud.get_forests()]
     districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts()]
-    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails()]
+    trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails()]
 
     return {'regions': regions, 'forests': forests, 'districts': districts, 'trails': trails}
 
@@ -148,20 +146,19 @@ def generate_index_dict():
 def generate_region_dict(region_name):
     forests = [{'name': forest.forest_name, 'isEmpty': forest.is_forest_empty, 'id': forest.forest_id} for forest in crud.get_forests_by_region(region_name)]
     districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts_by_region(region_name)]
-    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_region(region_name)]
+    trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_region(region_name)]
 
     return {'forests': forests, 'districts': districts, 'trails': trails}
 
 
 def generate_forest_dict(forest_name):
     districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts_by_forest(forest_name)]
-    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_forest(forest_name)]
-    print('GENERATING FOREST DICTIONARY YAYYYYYAYAYAYAYAYAYYA!')
+    trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_forest(forest_name)]
     return {'districts': districts, 'trails': trails}
 
 
 def generate_district_dict(district_name):
-    trails = [{'name': trail.trail_name, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_district(district_name)]
+    trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_district(district_name)]
 
     return {'trails': trails}
 
