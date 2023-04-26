@@ -33,13 +33,14 @@ document.addEventListener("DOMContentLoaded", () => {
                 `<option value = '${name}'>${name}</option>`)}
             }
             for (const trail of trails) {
-                const name = trail['name']
+                const name = `${trail['no']}: ${trail['name']}`
+                const id = trail['id']
                 const isEmpty = trail['isEmpty']
                 if (isEmpty === true){
                 document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${name}' disabled>${name}</option>`)} else {
+                `<option value = '' disabled>${name}</option>`)} else {
                 document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${name}'>${name}</option>`)}
+                `<option value = '${id}'>${name}</option>`)}
             }
 
         })
@@ -89,13 +90,14 @@ fetch(`/region${region}`)
         document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
             '<option value="" disabled selected>Choose a Trail</option>')
         for (const trail of trails) {
-            const name = trail['name']
+            const name = `${trail['no']}: ${trail['name']}`
+            const id = trail['id']
             const isEmpty = trail['isEmpty']
             if (isEmpty === true){
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}' disabled>${name}</option>`)} else {
+            `<option value = '' disabled>${name}</option>`)} else {
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}'>${name}</option>`)}
+            `<option value = '${id}'>${name}</option>`)}
         }
 
     })
@@ -129,15 +131,16 @@ fetch(`/forest${forest}`)
         document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
             '<option value="" disabled selected>Choose a Trail</option>')
         for (const trail of trails) {
-            const name = trail['name']
+            const name = `${trail['no']}: ${trail['name']}`
+            const id = trail['id']
             const isEmpty = trail['isEmpty']
             if (isEmpty === true){
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}' disabled>${name}</option>`)} else {
+            `<option value = '' disabled>${name}</option>`)} else {
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}'>${name}</option>`)}
-        }
+            `<option value = '${id}'>${name}</option>`)}
 
+        }
     })
 });
 
@@ -154,13 +157,14 @@ fetch(`/district${district}`)
         document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
             '<option value="" disabled selected>Choose a Trail</option>')
         for (const trail of trails) {
-            const name = trail['name']
+            const name = `${trail['no']}: ${trail['name']}`
+            const id = trail['id']
             const isEmpty = trail['isEmpty']
             if (isEmpty === true){
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}' disabled>${name}</option>`)} else {
+            `<option value = '' disabled>${name}</option>`)} else {
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}'>${name}</option>`)}
+            `<option value = '${id}'>${name}</option>`)}
         }
 
     })

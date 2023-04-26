@@ -83,21 +83,20 @@ def set_district():
 def choose_distance():
 
     # get list of TrailPoint objects corresponding to chosen trail
-    trail_name = request.form.get('trail-choice')
-    trailpoint_list = crud.get_trailpoint_list_with_trail_name(trail_name)
+    trail_id = request.form.get('trail-choice')
+    trail_name = crud.get_trail_name_with_trail_id(trail_id)
+    trailpoint_list = crud.get_trailpoint_list_with_trail_id(trail_id)
     # get list of lats and longs from 
-    session['lnglat_list'] = helper.get_lnglat_list(trailpoint_list)
+    session['lnglat_list'] = helper.get_lnglat_tuples(trailpoint_list)
 
     # get requested distance from trail in miles
     miles = request.form.get('fire-distance')
     miles = helper.to_int(miles)
-
     # get list of Fire instances of nearby fires
     nearby_fires = helper.get_nearby_fires(trailpoint_list, miles)
     
     # add fire information to session
     session['fires'] = [[fire.fire_id, fire.fire_name, fire.longitude, fire.latitude] for fire in nearby_fires]
-
     return render_template("map.html", fires=nearby_fires, trail_name=trail_name)
 
 @app.route('/mapData')

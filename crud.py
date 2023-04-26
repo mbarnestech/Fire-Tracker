@@ -96,9 +96,9 @@ def get_trails_by_district(district_name):
 
 # For calculating distance from trail to fires
 
-def get_trailpoint_list_with_trail_name(trail_name):
+def get_trailpoint_list_with_trail_id(trail_id):
     """return a list of TrailPoint objects corresponding to a trail name"""
-    return db.session.query(TrailPoint).join(Trail).filter(Trail.trail_name == trail_name).all()
+    return TrailPoint.query.filter_by(trail_id = trail_id).all()
 
 def get_fires_with_fire_ids(fires):
     """get list of Fire objects corresponding to list of fire_id numbers"""
@@ -111,6 +111,9 @@ def get_fires_with_fire_ids(fires):
 def get_trail_with_trail_name(trail_name):
     """return single Trail instance with trail_name attribute"""
     return Trail.query.filter_by(trail_name = trail_name).one()
+
+def get_trail_name_with_trail_id(trail_id):
+    return db.session.query(Trail.trail_name).filter(Trail.trail_id == trail_id).first()[0]
 
 def get_trail_ids():
     return [trail[0] for trail in db.session.query(Trail.trail_id).all()]
