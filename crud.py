@@ -21,17 +21,17 @@ def create_forest(forest_id, forest_name, region_id):
     """Create and return a new forest."""
     return Forest(forest_id=forest_id, forest_name=forest_name, region_id=region_id)
 
-def create_forest_coords(forest_id, latitude, longitude):
+def create_forest_coords(forest_id, polygon_no, latitude, longitude):
     """Create and return a new forest coordinate"""
-    return ForestCoord(forest_id=forest_id, latitude=latitude, longitude=longitude)
+    return ForestCoord(forest_id=forest_id, polygon_no=polygon_no, latitude=latitude, longitude=longitude)
 
 def create_district(district_id, district_name, region_id, forest_id):
     """Create and return a new district."""
     return District(district_id=district_id, district_name=district_name, region_id=region_id, forest_id=forest_id)
 
-def create_district_coords(district_id, latitude, longitude):
+def create_district_coords(district_id, polygon_no, latitude, longitude):
     """Create and return a new district coordinate"""
-    return DistrictCoord(district_id=district_id, latitude=latitude, longitude=longitude)
+    return DistrictCoord(district_id=district_id, polygon_no=polygon_no, latitude=latitude, longitude=longitude)
 
 def create_trail(trail_id, trail_no, trail_name, region_id, forest_id, district_id):
     """Create and return a new trail."""
@@ -214,6 +214,8 @@ def set_forests_to_empty():
             print(forest, db.session.query(Forest.is_forest_empty).filter(Forest.forest_id == forest).first())
     db.session.commit()
     print(f'******* FORESTS TABLE UPDATED *******')
+
+
 
 #---------------------------------------------------------------------#
 

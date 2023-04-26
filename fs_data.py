@@ -6,6 +6,8 @@ import geojson
 import re
 from bs4 import BeautifulSoup
 
+import crud
+
 #---------------------------------------------------------------------#
 
 # FOR SEEDING IN SEED.PY
@@ -128,3 +130,28 @@ def get_region_coords(region_coord_file=region_coord_file):
                                   'latitude': float(latitude),
                                   'longitude': float(longitude)})
     return region_coords
+
+
+# current location of forest boundaries kml file
+forest_coord_file = 'seed_data/Forest_Administrative_Boundaries_(Feature_Layer).kml'
+
+def get_forest_coords(forest_coord_file=forest_coord_file):
+    soup = get_soup_from_file(forest_coord_file)
+    coords = []
+    forest_ids = crud.get_forest_ids()
+    placemarks = soup.find_all('Placemark') 
+    for placemark in placemarks[:1]:
+        if placemark.select_one('[name="FORESTORGCODE"]').text in forest_ids:
+            polygons = placemark.find_all('coordinates')
+            count = 1
+            if polygons:
+                for polygon in polygons[:]:
+                    coords = polygon.string[:].split()
+                    for coord in coords[:]:
+                        latitude, longitude = coord.split(',')
+                        coords.append({'forest_id': placemark.select_one('[name="FORESTORGCODE"]').text,
+                                       'polygon_no': count,
+                                       'latitude': float(latitude),
+                                       'longitude': float(longitude)})
+                    count += 1
+    return coords

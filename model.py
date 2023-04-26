@@ -74,6 +74,7 @@ class ForestCoord(db.Model):
 
     coord_id = db.Column(db.Integer, primary_key=True)
     forest_id = db.Column(db.String, db.ForeignKey('forests.forest_id'))
+    polygon_no = db.Column(db.Integer)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
@@ -114,6 +115,7 @@ class DistrictCoord(db.Model):
 
     coord_id = db.Column(db.Integer, primary_key=True)
     district_id = db.Column(db.String, db.ForeignKey('districts.district_id'))
+    polygon_no = db.Column(db.Integer)
     latitude = db.Column(db.Float)
     longitude = db.Column(db.Float)
 
