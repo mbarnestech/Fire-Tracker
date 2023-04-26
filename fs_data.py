@@ -14,7 +14,10 @@ import crud
 # regions = fs_data.get_regions_list(fs_data.region_file)
 # forests, districts = fs_data.get_forests_districts_lists(fs_data.forest_district_file)
 # trails, trail_points = fs_data.get_trails_trail_points_lists(fs_data.trail_file)
-# coords = fs_data.get_region_coords()
+# region_coords = fs_data.get_region_coords()
+# forest_coords = fs_data.get_forest_coords()
+# district_coords = fs_data.get_district_coords()
+
 
 
 
@@ -137,10 +140,11 @@ forest_coord_file = 'seed_data/Forest_Administrative_Boundaries_(Feature_Layer).
 
 def get_forest_coords(forest_coord_file=forest_coord_file):
     soup = get_soup_from_file(forest_coord_file)
-    coords = []
+    forest_coords = []
     forest_ids = crud.get_forest_ids()
     placemarks = soup.find_all('Placemark') 
-    for placemark in placemarks[:1]:
+    print(len(placemarks))
+    for placemark in placemarks[:]:
         if placemark.select_one('[name="FORESTORGCODE"]').text in forest_ids:
             polygons = placemark.find_all('coordinates')
             count = 1
@@ -149,9 +153,35 @@ def get_forest_coords(forest_coord_file=forest_coord_file):
                     coords = polygon.string[:].split()
                     for coord in coords[:]:
                         latitude, longitude = coord.split(',')
-                        coords.append({'forest_id': placemark.select_one('[name="FORESTORGCODE"]').text,
-                                       'polygon_no': count,
-                                       'latitude': float(latitude),
-                                       'longitude': float(longitude)})
+                        forest_coords.append({'forest_id': placemark.select_one('[name="FORESTORGCODE"]').text,
+                                    'polygon_no': count,
+                                    'latitude': float(latitude),
+                                    'longitude': float(longitude)})
                     count += 1
-    return coords
+    return forest_coords
+
+
+# current location of district boundaries kml file
+district_coord_file = 'seed_data/Ranger_District_Boundaries_(Feature_Layer).kml'
+
+def get_district_coords(district_coord_file=district_coord_file):
+    soup = get_soup_from_file(district_coord_file)
+    district_coords = []
+    district_ids = crud.get_district_ids()
+    placemarks = soup.find_all('Placemark') 
+    print(len(placemarks))
+    for placemark in placemarks[:]:
+        if placemark.select_one('[name="DISTRICTORGCODE"]').text in district_ids:
+            polygons = placemark.find_all('coordinates')
+            count = 1
+            if polygons:
+                for polygon in polygons[:]:
+                    coords = polygon.string[:].split()
+                    for coord in coords[:]:
+                        latitude, longitude = coord.split(',')
+                        district_coords.append({'district_id': placemark.select_one('[name="DISTRICTORGCODE"]').text,
+                                    'polygon_no': count,
+                                    'latitude': float(latitude),
+                                    'longitude': float(longitude)})
+                    count += 1
+    return district_coords

@@ -111,9 +111,10 @@ def seed_forest_coords(forest_coords):
     for coord in forest_coords:
         if crud.forest_not_empty(coord['forest_id']):
             model.db.session.add(crud.create_forest_coords(coord['forest_id'], 
-                                        coord['latitude'],
-                                        coord['longitude']
-                                        ))
+                                                           coord['polygon_no'],
+                                                           coord['latitude'],
+                                                           coord['longitude']
+                                                           ))
     model.db.session.commit()
 
 
@@ -122,9 +123,10 @@ def seed_district_coords(district_coords):
     for coord in district_coords:
         if crud.district_not_empty(coord['district_id']):
             model.db.session.add(crud.create_district_coords(coord['district_id'], 
-                                        coord['latitude'],
-                                        coord['longitude']
-                                        ))
+                                                             coord['polygon_no'],
+                                                             coord['latitude'],
+                                                             coord['longitude']
+                                                             ))
     model.db.session.commit()
 
 def add_coord_tables():
