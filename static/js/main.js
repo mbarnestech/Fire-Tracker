@@ -1,13 +1,25 @@
 // enforce better formatting
 'use strict';
 
+// random color generator from https://www.tutorialstonight.com/random-color-generator-javascript
+function generateColor() {
+    let color = '#';
+    let digits = '0123456789ABCDEF';
+    for (let i = 0; i < 6; i++) {
+      // generate a random number between 0 and 15
+      let randomDigit = Math.floor(Math.random() * 16);
+      // append the random number to the color string
+      color += digits[randomDigit];
+    }
+    return `${color}`
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     fetch("/initialize")
         .then((response) => response.json())
         .then((data) => {
             const trails = data['trails'];
             const regions = data['regions'];
-            const regionCoords = data['regionCoords']
             const forests = data['forests'];
             const districts = data['districts'];
             mapboxgl.accessToken = `${data.mapKey}`;
@@ -15,29 +27,31 @@ document.addEventListener("DOMContentLoaded", () => {
             // Populate region choices
             for (const region of regions) {
                 document.querySelector('#region-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${region['name']}'>${region['name']}</option>`)
+                `<option value = '${region['id']}'>${region['name']}</option>`)
             }
 
             // Populate forest choices
             for (const forest of forests) {
                 const name = forest['name']
+                const id = forest['id']
                 const isEmpty = forest['isEmpty']
                 if (isEmpty === true){
                 document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${name}' disabled>${name}</option>`)} else {
+                `<option value = '${id}' disabled>${name}</option>`)} else {
                 document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${name}'>${name}</option>`)}
+                `<option value = '${id}'>${name}</option>`)}
             }
 
             // Populate district choices
             for (const district of districts) {
                 const name = district['name']
+                const id = district['id']
                 const isEmpty = district['isEmpty']
                 if (isEmpty === true){
                 document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${name}' disabled>${name}</option>`)} else {
+                `<option value = '${id}' disabled>${name}</option>`)} else {
                 document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${name}'>${name}</option>`)}
+                `<option value = '${id}'>${name}</option>`)}
             }
             // Populate trail choices
             for (const trail of trails) {
@@ -54,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Create map
             const map = new mapboxgl.Map({
-                container: 'map', // container ID
+                container: 'region-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
                 center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
                 zoom: 4 // starting zoom
@@ -67,180 +81,525 @@ document.addEventListener("DOMContentLoaded", () => {
                         'type': 'geojson',
                         'data': '/regions.geojson'
                     });
-                console.log(map.getSource('regions'))
 
-                map.addLayer({
-                    'id': 'regions-layer',
-                    'type': 'fill',
-                    'source': 'regions',
-                    // 'source-layer': 'Forest_Service_Regional_Boundaries__Feature_Layer_',
-                    'paint': {
-                        'fill-color': 'rgba(255, 0, 0, 0.4)'
-                    }
-                });
-                console.log(map.getLayer('regions-layer'))
+                // add fill color to regions
+                for (const region of regions) {
+                    const newColor = generateColor()
+                    map.addLayer({
+                        'id': `${region.name}-layer`,
+                        'type': 'fill',
+                        'source': 'regions',
+                        // 'source-layer': 'Forest_Service_Regional_Boundaries__Feature_Layer_',
+                        'paint': {
+                            'fill-color': newColor,
+                            'fill-opacity': 0.5,
+                            'fill-outline-color': newColor
+                        },
+                        'filter': ["==", region.name, ["get", "REGIONNAME"]]
+                    });
 
-                map.addLayer({
-                    'id': 'region-borders',
-                    'type': 'line',
-                    'source': 'regions',
-                    'layout': {},
-                    'paint': {
-                    'line-color': '#627BC1',
-                    'line-width': 2
-                    }
-                });
-
-                map.addLayer({
-                    'id': 'region-names',
-                    'type': 'symbol',
-                    'source': 'regions',
-                    'layout': {
-                        'text-field': [
-                            'format',
-                            ['upcase', ['get', 'REGIONNAME']],
-                            { 'font-scale': 0.8 },
-                            '\n',
-                            {},
-                            ['downcase', ['get', 'REGION']],
-                            { 'font-scale': 0.6 }
-                        ],
-                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold']
-                    }
-                });
-                console.log(map.getLayer('region-borders'))
+                    map.addLayer({
+                        'id': `${region.name}-label`,
+                        'type': 'symbol',
+                        'source': 'regions',
+                        'layout': {
+                            'text-field': [
+                                'format',
+                                ['upcase', ['get', 'REGIONNAME']],
+                                { 'font-scale': 0.8 },
+                                '\n',
+                                {},
+                                ['downcase', ['get', 'REGION']],
+                                { 'font-scale': 0.6 }
+                            ],
+                            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                        }
+                    });
+                    
+                    map.setFilter(`${region.name}-label`, ['==', ['get', 'REGION'], region.id]);
+                    
+                }
                 
                 
                 // Add zoom and rotation controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
+                
+                console.log('done with region map')
             });
-            console.log('donezo.')
         })
   });
 
 
 //   both 'input' and 'change' events seem to listen equally well for selection
 document.querySelector('#region-choice').addEventListener('input', (evt) => {
-const region = `?region=${evt.target.value}`
-fetch(`/region${region}`)
-    .then((response) => response.json())
-    .then((data) => {
-        const trails = data['trails'];
-        const forests = data['forests'];
-        const districts = data['districts'];
+    const region = `?region=${evt.target.value}`
+    fetch(`/region${region}`)
+        .then((response) => response.json())
+        .then((data) => {
+            const trails = data['trails'];
+            const forests = data['forests'];
+            const districts = data['districts'];
 
-        // Update Forests
-        document.querySelector('#forest-choice').innerHTML = ''
-        document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
-            '<option value="" disabled selected>Choose a National Forest</option>')
-        for (const forest of forests) {
-            const name = forest['name']
-            const isEmpty = forest['isEmpty']
-            if (isEmpty === true){
+            // Update Forests
+            document.querySelector('#forest-choice').innerHTML = ''
             document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}' disabled>${name}</option>`)} else {
-            document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}'>${name}</option>`)}
-        }
-        
-        // Update Districts
-        document.querySelector('#district-choice').innerHTML = ''
-        document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-            '<option value="" disabled selected>Choose a Ranger District</option>')
-        for (const district of districts) {
-            const name = district['name']
-            const isEmpty = district['isEmpty']
-            if (isEmpty === true){
+                '<option value="" disabled selected>Choose a National Forest</option>')
+            for (const forest of forests) {
+                const name = forest['name']
+                const id = forest['id']
+                const isEmpty = forest['isEmpty']
+                if (isEmpty === true){
+                document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}' disabled>${name}</option>`)} else {
+                document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}'>${name}</option>`)}
+            }
+            
+            // Update Districts
+            document.querySelector('#district-choice').innerHTML = ''
             document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}' disabled>${name}</option>`)} else {
-            document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}'>${name}</option>`)}
-        }
+                '<option value="" disabled selected>Choose a Ranger District</option>')
+            for (const district of districts) {
+                const name = district['name']
+                const id = district['id']
+                const isEmpty = district['isEmpty']
+                if (isEmpty === true){
+                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}' disabled>${name}</option>`)} else {
+                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}'>${name}</option>`)}
+            }
 
-        // Update trails
-        document.querySelector('#trail-choice').innerHTML = ''
-        document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            '<option value="" disabled selected>Choose a Trail</option>')
-        for (const trail of trails) {
-            const name = `${trail['no']}: ${trail['name']}`
-            const id = trail['id']
-            const isEmpty = trail['isEmpty']
-            if (isEmpty === true){
+            // Update trails
+            document.querySelector('#trail-choice').innerHTML = ''
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '' disabled>${name}</option>`)} else {
-            document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${id}'>${name}</option>`)}
-        }
+                '<option value="" disabled selected>Choose a Trail</option>')
+            for (const trail of trails) {
+                const name = `${trail['no']}: ${trail['name']}`
+                const id = trail['id']
+                const isEmpty = trail['isEmpty']
+                if (isEmpty === true){
+                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '' disabled>${name}</option>`)} else {
+                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}'>${name}</option>`)}
+            }
 
-    })
+            // Create map
+            const map = new mapboxgl.Map({
+                container: 'forest-map', // container ID
+                style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
+                // TODO: change to center of region
+                center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
+                zoom: 4 // starting zoom
+                });
+            
+            // Load map
+            map.on('load', () => {
+                map.addSource(
+                    'forests', {
+                        'type': 'geojson',
+                        'data': '/forests.geojson'
+                    });
+
+                // add fill color to forests
+                for (const forest of forests) {
+                    console.log(forest.id)
+                    const newColor = generateColor()
+                    console.log(newColor)
+                    map.addLayer({
+                        'id': `${forest.name}-layer`,
+                        'type': 'fill',
+                        'source': 'forests',
+                        'paint': {
+                            'fill-color': newColor,
+                            'fill-opacity': 0.5,
+                            'fill-outline-color': newColor
+                        },
+                        'filter': ["==", forest.id, ["get", "FORESTORGCODE"]]
+                    })
+                    
+                    map.addLayer({
+                        'id': `${forest.name}-label`,
+                        'type': 'symbol',
+                        'source': 'forests',
+                        'layout': {
+                            'text-field': [
+                                'format',
+                                ['upcase', ['get', 'FORESTNAME']],
+                                { 'font-scale': 0.8 },
+                                '\n',
+                                {},
+                                ['downcase', ['get', 'FORESTNUMBER']],
+                                { 'font-scale': 0.6 }
+                            ],
+                            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                        }
+                    });
+
+                    map.setFilter(`${forest.name}-label`, ['==', ['get', 'FORESTORGCODE'], forest.id]);
+                    
+                }
+
+                // Add navigation controls
+                map.addControl(new mapboxgl.NavigationControl());
+                
+                console.log('done with forest map')
+                
+            });
+
+        })
 });
 
 
 document.querySelector('#forest-choice').addEventListener('input', (evt) => {
-const forest = `?forest=${evt.target.value}`
-fetch(`/forest${forest}`)
-    .then((response) => response.json())
-    .then((data) => {
-        const trails = data['trails'];
-        const districts = data['districts'];
+    const forest = `?forest=${evt.target.value}`
+    console.log(`forest=${forest}`)
+    fetch(`/forest${forest}`)
+        .then((response) => response.json())
+        .then((data) => {
+            const trails = data['trails'];
+            const districts = data['districts'];
 
-        // Update Districts
-        document.querySelector('#district-choice').innerHTML = ''
-        document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-            '<option value="" disabled selected>Choose a Ranger District</option>')
-        for (const district of districts) {
-            const name = district['name']
-            const isEmpty = district['isEmpty']
-            if (isEmpty === true){
+            // Update Districts
+            document.querySelector('#district-choice').innerHTML = ''
             document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}' disabled>${name}</option>`)} else {
-            document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${name}'>${name}</option>`)}
-        }
+                '<option value="" disabled selected>Choose a Ranger District</option>')
+            for (const district of districts) {
+                const name = district['name']
+                const id = district['id']
+                const isEmpty = district['isEmpty']
+                if (isEmpty === true){
+                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}' disabled>${name}</option>`)} else {
+                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}'>${name}</option>`)}
+            }
 
-        // Update trails
-        document.querySelector('#trail-choice').innerHTML = ''
-        document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            '<option value="" disabled selected>Choose a Trail</option>')
-        for (const trail of trails) {
-            const name = `${trail['no']}: ${trail['name']}`
-            const id = trail['id']
-            const isEmpty = trail['isEmpty']
-            if (isEmpty === true){
+            // Update trails
+            document.querySelector('#trail-choice').innerHTML = ''
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '' disabled>${name}</option>`)} else {
-            document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${id}'>${name}</option>`)}
+                '<option value="" disabled selected>Choose a Trail</option>')
+            for (const trail of trails) {
+                const name = `${trail['no']}: ${trail['name']}`
+                const id = trail['id']
+                const isEmpty = trail['isEmpty']
+                if (isEmpty === true){
+                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '' disabled>${name}</option>`)} else {
+                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}'>${name}</option>`)}
 
-        }
-    })
+            }
+
+            // Create map
+            const map = new mapboxgl.Map({
+                container: 'district-map', // container ID
+                style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
+                // TODO: change to center of forest
+                center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
+                zoom: 4 // starting zoom
+                });
+            
+            // Load map
+            map.on('load', () => {
+                map.addSource(
+                    'districts', {
+                        'type': 'geojson',
+                        'data': '/districts.geojson'
+                    });
+
+                // add fill color to districts
+                for (const district of districts) {
+                    console.log(district.id)
+                    const newColor = generateColor()
+                    console.log(newColor)
+                    map.addLayer({
+                        'id': `${district.name}-layer`,
+                        'type': 'fill',
+                        'source': 'districts',
+                        'paint': {
+                            'fill-color': newColor,
+                            'fill-opacity': 0.5,
+                            'fill-outline-color': newColor
+                        },
+                        'filter': ["==", district.id, ["get", "DISTRICTORGCODE"]]
+                    })
+                    
+                    map.addLayer({
+                        'id': `${district.name}-label`,
+                        'type': 'symbol',
+                        'source': 'districts',
+                        'layout': {
+                            'text-field': [
+                                'format',
+                                ['upcase', ['get', 'DISTRICTNAME']],
+                                { 'font-scale': 0.8 },
+                                '\n',
+                                {},
+                                ['downcase', ['get', 'DISTRICTNUMBER']],
+                                { 'font-scale': 0.6 }
+                            ],
+                            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                        }
+                    });
+
+                    map.setFilter(`${district.name}-label`, ['==', ['get', 'DISTRICTORGCODE'], district.id]);
+                    
+                }
+
+                // Add navigation controls
+                map.addControl(new mapboxgl.NavigationControl());
+                
+                console.log('done with district map')
+                
+            });
+        })
 });
 
 
 document.querySelector('#district-choice').addEventListener('input', (evt) => {
-const district = `?district=${evt.target.value}`
-fetch(`/district${district}`)
-    .then((response) => response.json())
-    .then((data) => {
-        const trails = data['trails'];
+    const district = `?district=${evt.target.value}`
+    fetch(`/district${district}`)
+        .then((response) => response.json())
+        .then((data) => {
+            const trails = data['trails'];
 
-        // Update trails
-        document.querySelector('#trail-choice').innerHTML = ''
-        document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            '<option value="" disabled selected>Choose a Trail</option>')
-        for (const trail of trails) {
-            const name = `${trail['no']}: ${trail['name']}`
-            const id = trail['id']
-            const isEmpty = trail['isEmpty']
-            if (isEmpty === true){
+            // Update trails
+            document.querySelector('#trail-choice').innerHTML = ''
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '' disabled>${name}</option>`)} else {
-            document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-            `<option value = '${id}'>${name}</option>`)}
-        }
+                '<option value="" disabled selected>Choose a Trail</option>')
+            for (const trail of trails) {
+                const name = `${trail['no']}: ${trail['name']}`
+                const id = trail['id']
+                const isEmpty = trail['isEmpty']
+                if (isEmpty === true){
+                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '' disabled>${name}</option>`)} else {
+                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
+                `<option value = '${id}'>${name}</option>`)}
+            }
 
-    })
+            // Create map
+            const map = new mapboxgl.Map({
+                container: 'trail-map', // container ID
+                style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
+                // TODO: change to center of forest
+                center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
+                zoom: 4 // starting zoom
+                });
+            
+            // Load map
+            map.on('load', () => {
+                map.addSource(
+                    'trails', {
+                        'type': 'geojson',
+                        'data': '/trails.geojson'
+                    });
+
+                // add fill color to trails
+                for (const trail of trails) {
+                    console.log(trail.id)
+                    const newColor = generateColor()
+                    console.log(newColor)
+                    map.addLayer({
+                        'id': `${trail.name}-line`,
+                        'type': 'line',
+                        'source': 'trails',
+                        'layout': {
+                            'line-join': 'round',
+                            'line-cap': 'round'
+                        },
+                        'paint': {
+                            'line-color': newColor,
+                            'line-width': 8
+                        }
+                    })
+                    
+                    map.setFilter(`${trail.name}-line`, ['==', ['get', 'TRAIL_CN'], trail.id]);
+
+                    map.addLayer({
+                        'id': `${trail.name}-label`,
+                        'type': 'symbol',
+                        'source': 'trails',
+                        'layout': {
+                            'text-field': [
+                                'format',
+                                ['upcase', ['get', 'TRAIL_NAME']],
+                                { 'font-scale': 0.8 },
+                                '\n',
+                                {},
+                                ['downcase', ['get', 'TRAIL_NO']],
+                                { 'font-scale': 0.6 }
+                            ],
+                            'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold'],
+                        }
+                    });
+
+                    map.setFilter(`${trail.name}-label`, ['==', ['get', 'TRAIL_CN'], trail.id]);
+                    
+                }
+
+                // Add navigation controls
+                map.addControl(new mapboxgl.NavigationControl());
+                
+                console.log('done with trail map')
+                
+            });
+
+        })
 });
+
+
+document.querySelector('#trail-choice').addEventListener('input', (evt) => {
+    const trail = `?trail=${evt.target.value}`
+    fetch(`/trail${trail}`)
+        .then((response) => response.json())
+        .then((data) => {
+
+
+            // create new map centering on beginning of trail
+            const map = new mapboxgl.Map({
+            container: 'trail-and-fire-map', // container ID
+            style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
+            center: [`${data.lngLatList[0][0]}`, `${data.lngLatList[0][1]}`], // starting position [lng, lat]
+            // there is a map.fitBounds() feature but I haven't figured out yet how to use it to set original map
+            zoom: 9 // starting zoom
+            });
+            
+            /* ---------- CREATE POINT FEATURES ---------- */
+
+            // Create list of features
+            geoJsonFeatures = []
+            // Add fire features only if fires were found in range
+            if (data.fires.length > 0){
+                // loop through those fires
+                for (const fire of data.fires){
+                    // create one feature for each fire, changing description and coordinate with each
+                    geoJsonFeatures.push(
+                        {
+                            'type': 'Feature',
+                            'properties': {
+                            'description': `<p>${fire[1]}</p>`,
+                            // 'iconSize': [30, 30],
+                            'icon': 'fire-station' // maki icon stylized for this map
+                            },
+                            'geometry': {
+                            'type': 'Point',
+                            'coordinates': [`${fire[2]}`, `${fire[3]}`]
+                            }
+                        }
+                    )
+                }
+            };
+            // create a Trailhead feature at first long/lat trail point
+            geoJsonFeatures.push(
+                {
+                    'type': 'Feature',
+                    'properties': {
+                    'description': `<p>Trailhead</p>`,
+                    // 'iconSize': [30, 30],
+                    'icon': 'parking' // maki icon stylized for this map
+                    },
+                    'geometry': {
+                    'type': 'Point',
+                    'coordinates': [`${data.lngLatList[0][0]}`, `${data.lngLatList[0][1]}`]
+                    }
+                }
+            )
+            
+            // include the above list of features when loading map
+            map.on('load', () => {
+                map.addSource('places', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'FeatureCollection',
+                        'features': geoJsonFeatures
+                    }
+                });
+
+                // Add a layer showing the places.
+                map.addLayer({
+                    'id': 'places',
+                    'type': 'symbol',
+                    'source': 'places',
+                    'layout': {
+                    'icon-image': ['get', 'icon'],
+                    'icon-allow-overlap': true
+                    }
+                });
+
+                // When a click event occurs on a feature in the places layer, open a popup at the
+                // location of the feature, with description HTML from its properties.
+                map.on('click', 'places', (e) => {
+                    // Copy coordinates array.
+                    const coordinates = e.features[0].geometry.coordinates.slice();
+                    const description = e.features[0].properties.description;
+                    
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+                    
+                    new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                    });
+                    
+                // Change the cursor to a pointer when the mouse is over the places layer.
+                map.on('mouseenter', 'places', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                    });
+                
+                // Change it back to a pointer when it leaves.
+                map.on('mouseleave', 'places', () => {
+                    map.getCanvas().style.cursor = '';
+                    });
+            });
+
+            /* ---------- CREATE TRAIL FEATURE ---------- */
+
+            // create list of trail coordinates the map can use
+            const coords = []
+            for (const coord of data.lngLatList){
+                coords.push(coord)
+            }
+            
+            // create connected line of all trailpoint coordinates
+            map.on('load', () => {
+                // adding the coordinates for the line to use
+                map.addSource('route', {
+                'type': 'geojson',
+                'data': {
+                'type': 'Feature',
+                'properties': {},
+                'geometry': {
+                'type': 'LineString',
+                'coordinates': coords
+                }
+                }
+                });
+                // adding the line itself
+                map.addLayer({
+                'id': 'route',
+                'type': 'line',
+                'source': 'route',
+                'layout': {
+                'line-join': 'round',
+                'line-cap': 'round'
+                },
+                'paint': {
+                'line-color': '#000',
+                'line-width': 1
+                }
+                });
+                });
+      
+      });
+}
 
 // {% if fires %}
 //     <h1> Fires within {{ miles }} of {{ trail_name }}:</h1> 

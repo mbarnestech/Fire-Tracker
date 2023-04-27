@@ -76,27 +76,27 @@ def get_fires():
 
 # Get tables by Region
 
-def get_forests_by_region(region_name):
-    return Forest.query.join(Region).filter_by(region_name = region_name).all()
+def get_forests_by_region(region_id):
+    return Forest.query.filter_by(region_id = region_id).all()
 
-def get_districts_by_region(region_name):
-    return District.query.join(Region).filter_by(region_name = region_name).all()
+def get_districts_by_region(region_id):
+    return District.query.filter_by(region_id = region_id).all()
 
-def get_trails_by_region(region_name):
-    return Trail.query.join(Region).filter_by(region_name = region_name).all()
+def get_trails_by_region(region_id):
+    return Trail.query.filter_by(region_id = region_id).all()
 
 # Get tables by Forest
 
-def get_districts_by_forest(forest_name):
-    return District.query.join(Forest).filter_by(forest_name = forest_name).all()
+def get_districts_by_forest(forest_id):
+    return District.query.filter_by(forest_id = forest_id).all()
 
-def get_trails_by_forest(forest_name):
-    return Trail.query.join(Forest).filter_by(forest_name = forest_name).all()
+def get_trails_by_forest(forest_id):
+    return Trail.query.filter_by(forest_id = forest_id).all()
 
 # Get tables by District
 
-def get_trails_by_district(district_name):
-    return Trail.query.join(District).filter_by(district_name = district_name).all()
+def get_trails_by_district(district_id):
+    return Trail.query.filter_by(district_id = district_id).all()
 
 # For calculating distance from trail to fires
 

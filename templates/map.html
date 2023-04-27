@@ -10,21 +10,8 @@
 
 {% block content %}
 
-<section id="trail-fire-info">
-{% if fires %}
-<h1> Fires near {{ trail_name }}:</h1> 
-<ul>{% for fire in fires %}
-    <li>{{ fire.fire_name }}</li>
-    <li><a href='{{ fire.fire_url }}'/> Link to inciweb information on {{ fire.fire_name }}</a></li>
-    {% endfor %}
-</ul>
-{% else %}
-<p>There are no fires near {{ trail_name }}.</p>
-{% endif %}
-</section>
-
 <section id="trail-fire-map">
-<h1>Map of Trail and Fire</h1>
+<h1>Map!</h1>
 <section class="map">
 <div id="map" style="width: 500px; height: 500px"></div>
 </section>
@@ -32,7 +19,7 @@
 
 
 
-<script src="/static/js/mapbox.js"></script> 
+<script src="/static/js/main2.js"></script> 
 
   
 {% endblock %}

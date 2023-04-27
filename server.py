@@ -55,8 +55,8 @@ def initialize_main():
 @app.route('/region')
 def set_region():
 
-    region_name = request.args.get('region')
-    region_dict = helper.generate_region_dict(region_name)
+    region_id = request.args.get('region')
+    region_dict = helper.generate_region_dict(region_id)
     print('SETTING REGION' + '*' * 20)
     return jsonify(region_dict)
 
@@ -64,18 +64,18 @@ def set_region():
 @app.route('/forest')
 def set_forest():
 
-    forest_name = request.args.get('forest')
-    forest_dict = helper.generate_forest_dict(forest_name)
+    forest_id = request.args.get('forest')
+    forest_dict = helper.generate_forest_dict(forest_id)
+    print(f'{forest_dict=}')
     print('SETTING FOREST' + '*' * 20)
-    print(forest_name, forest_dict)
     return jsonify(forest_dict)
 
 
 @app.route('/district')
 def set_district():
 
-    district_name = request.args.get('district')
-    district_dict = helper.generate_district_dict(district_name)
+    district_id = request.args.get('district')
+    district_dict = helper.generate_district_dict(district_id)
 
     return jsonify(district_dict)
 
@@ -109,6 +109,21 @@ def initialize_map():
 def publish_geojson_regions():
     region_json = fs_data.get_geojson(fs_data.region_file)
     return region_json
+
+@app.route('/forests.geojson')
+def publish_geojson_forests():
+    forest_json = fs_data.get_geojson(fs_data.forest_file)
+    return forest_json
+
+@app.route('/districts.geojson')
+def publish_geojson_districts():
+    district_json = fs_data.get_geojson(fs_data.district_file)
+    return district_json
+
+@app.route('/trails.geojson')
+def publish_geojson_trails():
+    trail_json = fs_data.get_geojson(fs_data.trail_file)
+    return trail_json
 
 
 #---------------------------------------------------------------------#
