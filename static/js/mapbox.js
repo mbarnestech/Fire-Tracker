@@ -1,5 +1,5 @@
-function createMap(){
-      fetch('/mapData')
+function initializeMap(){
+      fetch('/initializeMap')
         .then((response)=>response.json())
         .then((data)=>{
             mapboxgl.accessToken = `${data.mapKey}`;
@@ -146,5 +146,8 @@ function createMap(){
         });
 }
 
-// run above function
-createMap();
+// run initializeMap on first page load
+initializeMap();
+
+
+// center: [-98.5795, 39.828175], // starting position [lng, lat] (geographic center of CONUS according to: https://latitude.to/articles-by-country/us/united-states/4266/geographic-center-of-the-contiguous-united-states)

@@ -1,10 +1,15 @@
 {% extends 'base.html' %}
 
-{% block title%} Choose a Region {% endblock %}
+{% block title%} Fire Tracker {% endblock %}
+
+{% block scripts %} 
+<link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script> 
+{% endblock %}
 
 {% block content %}
 
-<form id='region-form' method='post' action ='/choose_distance'>
+<form id='search-form' method='post' action ='/search'>
     <fieldset id="region-fieldset">
         <legend>Please pick a US Forest Service Region</legend>
         <select name="region-choice" id="region-choice">
@@ -35,10 +40,22 @@
         <input type="text" name="fire-distance" id="fire-distance" placeholder="25">
     </fieldset>
     <fieldset>
-        <legend>Submit</legend>
-        <input type='submit' value="Next">
+        <legend>Search</legend>
+        <input type='submit' value="Search">
     </fieldset>
 </form>
 
+<section id="trail-fire-map">
+    <section class="map">
+        <div id="map" style="width: 500px; height: 500px"></div>
+    </section>
+</section>
+
+<section id="trail-fire-info">
+
+</section>
+    
+    
+    
 <script src="/static/js/main.js"></script> 
 {% endblock %}

@@ -79,8 +79,8 @@ def set_district():
     return jsonify(district_dict)
 
 
-@app.route("/choose_distance", methods=['POST'])
-def choose_distance():
+@app.route("/search", methods=['POST'])
+def search():
 
     # get list of TrailPoint objects corresponding to chosen trail
     trail_id = request.form.get('trail-choice')
@@ -99,9 +99,9 @@ def choose_distance():
     session['fires'] = [[fire.fire_id, fire.fire_name, fire.longitude, fire.latitude] for fire in nearby_fires]
     return render_template("map.html", fires=nearby_fires, trail_name=trail_name)
 
-@app.route('/mapData')
-def giveMapBoxMapData():
-    dataForMap = {'lngLatList': session['lnglat_list'], 'fires': session['fires'], 'mapKey': environ['DEFAULTMAPBOXTOKEN']}
+@app.route('/initializeMap')
+def initialize_map():
+    dataForMap = {'mapKey': environ['DEFAULTMAPBOXTOKEN']}
     return jsonify(dataForMap)
 
 

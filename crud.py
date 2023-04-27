@@ -54,6 +54,10 @@ def get_regions():
     """return a list of all Region objects"""
     return Region.query.all()
 
+def get_region_coords():
+    """return a list of all RegionCoord objects"""
+    return RegionCoord.query.all()
+
 def get_districts():
     """return a list of all District objects"""
     return District.query.all()

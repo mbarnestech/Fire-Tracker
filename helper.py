@@ -1,6 +1,7 @@
 """ file for helper functions """
 from datetime import date
 import crud
+from os import environ
 
 
 #---------------------------------------------------------------------#
@@ -136,11 +137,13 @@ def fires_are_old():
 
 def generate_index_dict():
     regions = [{'name': region.region_name, 'id': region.region_id} for region in crud.get_regions()]
+    regionCoords = [{'id': coord.region_id, 'latitude': coord.latitude, 'longitude': coord.longitude} for coord in crud.get_region_coords()]
     forests = [{'name': forest.forest_name, 'isEmpty': forest.is_forest_empty, 'id': forest.forest_id} for forest in crud.get_forests()]
     districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts()]
     trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails()]
+    mapKey = environ['DEFAULTMAPBOXTOKEN']
 
-    return {'regions': regions, 'forests': forests, 'districts': districts, 'trails': trails}
+    return {'regions': regions, 'regionCoords': regionCoords, 'forests': forests, 'districts': districts, 'trails': trails, 'mapKey': mapKey}
 
 
 def generate_region_dict(region_name):
