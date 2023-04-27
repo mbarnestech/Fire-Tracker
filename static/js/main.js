@@ -57,130 +57,60 @@ document.addEventListener("DOMContentLoaded", () => {
                 container: 'map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
                 center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 2 // starting zoom
+                zoom: 4 // starting zoom
                 });
             
-            // Create regions
-            const geoJsonRegions = []
-            // for (const region of regions) {
-                const coordinates = []
-                for (const coord of regionCoords) {
-                    if (regions[0].id === coord.id) {
-                        coordinates.push([coord.longitude, coord.latitude])
-                    }
-                }
-                geoJsonRegions.push(
-                    {
-                        'type': 'Feature',
-                        'properties': {'description': `<p>${regions[0].name}</p>`},
-                        'id': regions[0].name,
-                        'geometry': {
-                            'type': 'Polygon',
-                            'coordinates': [coordinates]
-                        }
-                    }
-                )
-            // }
-            
-
             // Load map
             map.on('load', () => {
-                map.addSource('regions', {
-                    'type': 'geojson',
-                    'data': {
-                        'type': 'FeatureCollection',
-                        'features': geoJsonRegions
-                    }
-                });
-                // Add a new layer to visualize the polygon.
+                map.addSource(
+                    'regions', {
+                        'type': 'geojson',
+                        'data': '/regions.geojson'
+                    });
+                console.log(map.getSource('regions'))
+
                 map.addLayer({
-                    'id': 'maine',
+                    'id': 'regions-layer',
                     'type': 'fill',
-                    'source': 'regions', // reference the data source
-                    'layout': {},
+                    'source': 'regions',
+                    // 'source-layer': 'Forest_Service_Regional_Boundaries__Feature_Layer_',
                     'paint': {
-                        'fill-color': '#0080ff', // blue color fill
-                        'fill-opacity': 0.5
+                        'fill-color': 'rgba(255, 0, 0, 0.4)'
                     }
                 });
-                // Add a black outline around the polygon.
+                console.log(map.getLayer('regions-layer'))
+
                 map.addLayer({
-                    'id': 'outline',
+                    'id': 'region-borders',
                     'type': 'line',
                     'source': 'regions',
                     'layout': {},
                     'paint': {
-                    'line-color': '#000',
-                    'line-width': 3
+                    'line-color': '#627BC1',
+                    'line-width': 2
                     }
                 });
-                // Add a layer showing the region polygons.
-                // map.addLayer({
-                //     'id': 'regions-layer',
-                //     'type': 'fill',
-                //     'source': 'regions',
-                //     'paint': {
-                //         'fill-color': 'rgba(200, 100, 240, 0.4)',
-                //         'fill-outline-color': 'rgba(200, 100, 240, 1)'
-                //     }
-                // });
 
-                // // Add a layer showing the regions.
-                // map.addLayer({
-                //     'id': 'region-fills',
-                //     'type': 'fill',
-                //     'source': 'regions',
-                //     'layout': {},
-                //     'paint': {
-                //         'fill-color': '#627BC1',
-                //         'fill-opacity': [
-                //             'case',
-                //             ['boolean', ['feature-state', 'hover'], false],
-                //             1,
-                //             0.5
-                //         ]
-                //     }
-                // });
+                map.addLayer({
+                    'id': 'region-names',
+                    'type': 'symbol',
+                    'source': 'regions',
+                    'layout': {
+                        'text-field': [
+                            'format',
+                            ['upcase', ['get', 'REGIONNAME']],
+                            { 'font-scale': 0.8 },
+                            '\n',
+                            {},
+                            ['downcase', ['get', 'REGION']],
+                            { 'font-scale': 0.6 }
+                        ],
+                        'text-font': ['Open Sans Semibold', 'Arial Unicode MS Bold']
+                    }
+                });
+                console.log(map.getLayer('region-borders'))
                 
-                // map.addLayer({
-                //     'id': 'region-borders',
-                //     'type': 'line',
-                //     'source': 'regions',
-                //     'layout': {},
-                //     'paint': {
-                //     'line-color': '#627BC1',
-                //     'line-width': 2
-                //     }
-                // });
                 
-                // // update feature state when user moves mouse over the region-fill layer
-                // map.on('mousemove', 'region-fills', (e) => {
-                //     if (e.features.length > 0) {
-                //         if (hoveredStateId !== null) {
-                //             map.setFeatureState(
-                //                 { source: 'regions', id: hoveredStateId },
-                //                 { hover: false }
-                //             );
-                //         }
-                //         hoveredStateId = e.features[0].id;
-                //         map.setFeatureState(
-                //             { source: 'regions', id: hoveredStateId },
-                //             { hover: true }
-                //         );
-                //     }
-                // });
-                
-                // // When the mouse leaves the state-fill layer, update the feature state of the
-                // // previously hovered feature.
-                // map.on('mouseleave', 'region-fills', () => {
-                //     if (hoveredStateId !== null) {
-                //         map.setFeatureState(
-                //             { source: 'regions', id: hoveredStateId },
-                //             { hover: false }
-                //         );
-                //     }
-                //     hoveredStateId = null;
-                // });
                 // Add zoom and rotation controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
             });

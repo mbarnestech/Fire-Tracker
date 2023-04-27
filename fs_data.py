@@ -185,3 +185,12 @@ def get_district_coords(district_coord_file=district_coord_file):
                                     'longitude': float(longitude)})
                     count += 1
     return district_coords
+
+region_file = 'seed_data/Forest_Service_Regional_Boundaries_(Feature_Layer).geojson'
+def get_geojson(file):
+    """get geojson"""
+    with open(file) as file:
+        region_json = geojson.load(file)
+    return region_json
+
+# region_json = fs_data.get_geojson(fs_data.region_file)

@@ -8,6 +8,7 @@ import jinja2
 from model import connect_to_db, db
 import crud
 import helper
+import fs_data
 
 #---------------------------------------------------------------------#
 
@@ -103,6 +104,11 @@ def search():
 def initialize_map():
     dataForMap = {'mapKey': environ['DEFAULTMAPBOXTOKEN']}
     return jsonify(dataForMap)
+
+@app.route('/regions.geojson')
+def publish_geojson_regions():
+    region_json = fs_data.get_geojson(fs_data.region_file)
+    return region_json
 
 
 #---------------------------------------------------------------------#
