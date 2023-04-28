@@ -190,8 +190,8 @@ document.querySelector('#region-choice').addEventListener('input', (evt) => {
                 container: 'forest-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
                 // TODO: change to center of region
-                center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 4 // starting zoom
+                center: data['startingLngLat'], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
+                zoom: 6 // starting zoom
                 });
             
             // Load map

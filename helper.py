@@ -2,6 +2,8 @@
 from datetime import date
 import crud
 from os import environ
+import requests
+import re
 
 
 #---------------------------------------------------------------------#
@@ -30,10 +32,11 @@ def create_decimal_latlong(latlong):
     
 def get_latlong_float(latlong):
     """turn latlong list into float"""
-    neg, latlong_str, _ = latlong
+    neg, latlong_str, dir = latlong
     latlong_float = float(latlong_str)
-    if neg:
+    if neg or (dir and dir == 'W' or dir == 'S'):
         latlong_float *= -1
+
     return latlong_float
 
 #---------------------------------------------------------------------#
@@ -146,11 +149,13 @@ def generate_index_dict():
 
 
 def generate_region_dict(region_id):
+    region = crud.get_region_by_region(region_id)
+    starting_lnglat = [region.long, region.lat]
     forests = [{'name': forest.forest_name, 'isEmpty': forest.is_forest_empty, 'id': forest.forest_id} for forest in crud.get_forests_by_region(region_id)]
     districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts_by_region(region_id)]
     trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_region(region_id)]
 
-    return {'forests': forests, 'districts': districts, 'trails': trails}
+    return {'forests': forests, 'districts': districts, 'trails': trails, 'startingLngLat': starting_lnglat}
 
 
 def generate_forest_dict(forest_id):
@@ -174,21 +179,24 @@ def generate_trail_dict(trail_id):
     return {'fires': fires, 'trail_name': trail_name, 'trailhead': trailhead}
 
 # for updating tables
-def get_region_mmll():
-    region_coords = crud.get_region_coords()
-    region_coord_dict = {}
-    for coord in region_coords:
-        region_id = coord.region_id
-        region_coord_dict[region_id] = region_coord_dict.get(region_id, {})
-        if region_coord_dict[region_id] == {}:
-            region_coord_dict[region_id] = {'max_lat': coord.latitude,
-                                            'min_lat': coord.latitude,
-                                            'max_long': coord.longitude,
-                                            'min_long': coord.longitude
-                                            }
-        else:
-            region_coord_dict[region_id]['max_lat'] = max(coord.latitude, region_coord_dict[region_id]['max_lat'])
-            region_coord_dict[region_id]['min_lat'] = min(coord.latitude, region_coord_dict[region_id]['min_lat'])
-            region_coord_dict[region_id]['max_long'] = max(coord.longitude, region_coord_dict[region_id]['max_long'])
-            region_coord_dict[region_id]['min_long'] = min(coord.longitude, region_coord_dict[region_id]['min_long'])
-    return region_coord_dict
+def get_lnglat_for_place(place):
+    "given a city or forest unit, get LngLat"
+
+    place_string = place + ' coordinates'
+    response = requests.get(f'https://www.google.com/search?q={place_string}')
+    html_string = response.text
+    result = re.search(r"(?P<Nneg>-)?(?P<Ndegrees>\d+\.\d+).{1,2}? ?(?P<Ndir>N?S?),? (?P<Wneg>-)?(?P<Wdegrees>\d+\.\d+).{1,2}? ?(?P<Wdir>E?W?)", html_string)
+    if result:
+        print('yay')
+        print(f"{result.group('Nneg')=}, {result.group('Wneg')=}, {result.group('Ndegrees')=}, {result.group('Wdegrees')=}, {result.group('Ndir')=}, {result.group('Wdir')=}")
+        lat = get_latlong_float([result.group('Nneg'), result.group('Ndegrees'), result.group('Ndir')])
+        lng = get_latlong_float([result.group('Wneg'), result.group('Wdegrees'), result.group('Wdir')])
+        return [lng, lat]
+    result = re.search(r"(?P<Nneg>-)?(?P<Ndegrees>\d{2,3} ?)\°(?P<Nminutes>\d{1,2})\′(?P<Nseconds>\d*\.?\d*)?\″?N?S? (?P<Wneg>-)?(?P<Wdegrees>\d{2,3} ?)\°(?P<Wminutes>\d{1,2})\′(?P<Wseconds>\d*\.?\d*)?", html_string) 
+    if result:
+        print('also yay!')
+        lat = create_decimal_latlong([result.group('Nneg'), result.group('Ndegrees'), result.group('Nminutes'), result.group('Nseconds') ])
+        lng = create_decimal_latlong([result.group('Wneg'), result.group('Wdegrees'), result.group('Wminutes'), result.group('Wseconds') ])
+        return [lng, lat]
+    print('********** COULD NOT FIND COORDINATES **********')
+

@@ -4,7 +4,7 @@
 from model import Region, Forest, District, Trail, TrailPoint, Fire, RegionCoord, ForestCoord, DistrictCoord,db, connect_to_db
 import helper
 import fire_data
-
+import fs_data
 
 #---------------------------------------------------------------------#
 # CREATE
@@ -75,6 +75,9 @@ def get_fires():
     return Fire.query.all()
 
 # Get tables by Region
+
+def get_region_by_region(region_id):
+    return Region.query.filter_by(region_id = region_id).first()
 
 def get_forests_by_region(region_id):
     return Forest.query.filter_by(region_id = region_id).all()
@@ -219,7 +222,14 @@ def set_forests_to_empty():
     db.session.commit()
     print(f'******* FORESTS TABLE UPDATED *******')
 
-
+def add_latlong_to_regions():
+    region_places = fs_data.get_region_places()
+    for region in region_places:
+        long, lat = helper.get_lnglat_for_place(region['place'])
+        db.session.query(Region).filter(Region.region_id == region['id']).update(
+                {'lat': lat, 'long': long}, synchronize_session="fetch")
+    db.session.commit()
+    print(f'******* REGIONS TABLE UPDATED *******')
 
 #---------------------------------------------------------------------#
 

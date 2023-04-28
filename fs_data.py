@@ -202,3 +202,18 @@ def get_geojson(file):
 # forest_json = fs_data.get_geojson(fs_data.forest_file)
 # district_json = fs_data.get_geojson(fs_data.district_file)
 # trail_json = fs_data.get_geojson(fs_data.trail_file)
+
+# get places for helper.get_lnglat_for_place(place) 
+
+def get_region_places(region_coord_file=region_coord_file):
+    """get list of coordinate dictionaries for each region"""
+    
+    soup = get_soup_from_file(region_coord_file)
+
+    placemarks = soup.find_all('Placemark') 
+    region_places = []       
+    for placemark in placemarks[:]:
+        id = placemark.select_one('[name="REGION"]').text
+        hq = placemark.select_one('[name="REGIONHEADQUARTERS"]').text
+        region_places.append({'id': id, 'place': hq})
+    return region_places
