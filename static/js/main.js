@@ -456,13 +456,39 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
     fetch(`/trail${trail}`)
         .then((response) => response.json())
         .then((data) => {
+            const fires = data.fires
+            const trail_name = data.trail_name
+            const trailhead = data.trailhead
 
+            // reset fire information
+            document.querySelector('#trail-and-fire-info').innerHTML = ""
+
+            // provide fire info outside of map
+            if (fires.length === 0){
+                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
+                    `<h3> There are currently no fires within 25 miles of ${trail_name}. </h3>`)
+            } else if (fires.length === 1){
+                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
+                    `<h3> There is currently one fire within 25 miles of ${trail_name}: </h3>
+                    <h4><a href=${fires[0].url}>${fires[0].name}</a></h4>
+                    `)
+            } else {
+                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
+                    `<h3> There are currently ${fires.length} fires within 25 miles of ${trail_name}:</h3>
+                    <ul>`)
+                for (const fire in fires){
+                    document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
+                    `<li><h4><a href=${fire.url}>${fire.name}</a></h4></li>`)
+                }
+                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
+                    `</ul`)
+            }
 
             // create new map centering on beginning of trail
             const map = new mapboxgl.Map({
             container: 'trail-and-fire-map', // container ID
             style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
-            center: [`${data.lngLatList[0][0]}`, `${data.lngLatList[0][1]}`], // starting position [lng, lat]
+            center: trailhead, // starting position [lng, lat]
             // there is a map.fitBounds() feature but I haven't figured out yet how to use it to set original map
             zoom: 9 // starting zoom
             });
@@ -470,7 +496,7 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
             /* ---------- CREATE POINT FEATURES ---------- */
 
             // Create list of features
-            geoJsonFeatures = []
+            const geoJsonFeatures = []
             // Add fire features only if fires were found in range
             if (data.fires.length > 0){
                 // loop through those fires
@@ -480,13 +506,13 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                         {
                             'type': 'Feature',
                             'properties': {
-                            'description': `<p>${fire[1]}</p>`,
+                            'description': `<p>${fire.name}</p>`,
                             // 'iconSize': [30, 30],
                             'icon': 'fire-station' // maki icon stylized for this map
                             },
                             'geometry': {
                             'type': 'Point',
-                            'coordinates': [`${fire[2]}`, `${fire[3]}`]
+                            'coordinates': [`${fire.longitude}`, `${fire.latitude}`]
                             }
                         }
                     )
@@ -497,13 +523,13 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                 {
                     'type': 'Feature',
                     'properties': {
-                    'description': `<p>Trailhead</p>`,
+                    'description': `<p>Trailhead of ${trail_name}</p>`,
                     // 'iconSize': [30, 30],
                     'icon': 'parking' // maki icon stylized for this map
                     },
                     'geometry': {
                     'type': 'Point',
-                    'coordinates': [`${data.lngLatList[0][0]}`, `${data.lngLatList[0][1]}`]
+                    'coordinates': trailhead
                     }
                 }
             )
@@ -562,52 +588,31 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
 
             /* ---------- CREATE TRAIL FEATURE ---------- */
 
-            // create list of trail coordinates the map can use
-            const coords = []
-            for (const coord of data.lngLatList){
-                coords.push(coord)
-            }
-            
             // create connected line of all trailpoint coordinates
             map.on('load', () => {
                 // adding the coordinates for the line to use
                 map.addSource('route', {
-                'type': 'geojson',
-                'data': {
-                'type': 'Feature',
-                'properties': {},
-                'geometry': {
-                'type': 'LineString',
-                'coordinates': coords
-                }
-                }
+                    'type': 'geojson',
+                    'data': '/trails.geojson'
                 });
                 // adding the line itself
                 map.addLayer({
-                'id': 'route',
-                'type': 'line',
-                'source': 'route',
-                'layout': {
-                'line-join': 'round',
-                'line-cap': 'round'
-                },
-                'paint': {
-                'line-color': '#000',
-                'line-width': 1
-                }
+                    'id': 'trail-route',
+                    'type': 'line',
+                    'source': 'route',
+                    'layout': {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                        'paint': {
+                        'line-color': '#000',
+                        'line-width': 10
+                    }
                 });
+                map.setFilter(`trail-route`, ['==', ['get', 'TRAIL_CN'], `${trail}`]);
+                console.log(map.getLayer('trail-route'))
                 });
-      
-      });
-}
 
-// {% if fires %}
-//     <h1> Fires within {{ miles }} of {{ trail_name }}:</h1> 
-//     <ul>{% for fire in fires %}
-//         <li>{{ fire.fire_name }}</li>
-//         <li><a href='{{ fire.fire_url }}'/> Link to inciweb information on {{ fire.fire_name }}</a></li>
-//         {% endfor %}
-//     </ul>
-//     {% else %}
-//         <p>There are no fires within {{ miles }} of {{ trail_name }}.</p>
-//     {% endif %}
+      
+        });
+});

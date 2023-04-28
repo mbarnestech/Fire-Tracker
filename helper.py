@@ -164,3 +164,31 @@ def generate_district_dict(district_id):
 
     return {'trails': trails}
 
+def generate_trail_dict(trail_id):
+    trail_name = crud.get_trail_name_with_trail_id(trail_id)
+    trailpoint_list = crud.get_trailpoint_list_with_trail_id(trail_id)
+    trailhead = [trailpoint_list[0].longitude, trailpoint_list[0].latitude]
+    nearby_fires = get_nearby_fires(trailpoint_list, 25)
+    fires = [{'id': fire.fire_id, 'name': fire.fire_name, 'url': fire.fire_url, 'longitude': fire.longitude, 'latitude': fire.latitude} for fire in nearby_fires]
+
+    return {'fires': fires, 'trail_name': trail_name, 'trailhead': trailhead}
+
+# for updating tables
+def get_region_mmll():
+    region_coords = crud.get_region_coords()
+    region_coord_dict = {}
+    for coord in region_coords:
+        region_id = coord.region_id
+        region_coord_dict[region_id] = region_coord_dict.get(region_id, {})
+        if region_coord_dict[region_id] == {}:
+            region_coord_dict[region_id] = {'max_lat': coord.latitude,
+                                            'min_lat': coord.latitude,
+                                            'max_long': coord.longitude,
+                                            'min_long': coord.longitude
+                                            }
+        else:
+            region_coord_dict[region_id]['max_lat'] = max(coord.latitude, region_coord_dict[region_id]['max_lat'])
+            region_coord_dict[region_id]['min_lat'] = min(coord.latitude, region_coord_dict[region_id]['min_lat'])
+            region_coord_dict[region_id]['max_long'] = max(coord.longitude, region_coord_dict[region_id]['max_long'])
+            region_coord_dict[region_id]['min_long'] = min(coord.longitude, region_coord_dict[region_id]['min_long'])
+    return region_coord_dict

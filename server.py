@@ -79,6 +79,13 @@ def set_district():
 
     return jsonify(district_dict)
 
+@app.route('/trail')
+def set_trail():
+
+    trail_id = request.args.get('trail')
+    trail_dict = helper.generate_trail_dict(trail_id)
+
+    return jsonify(trail_dict)
 
 @app.route("/search", methods=['POST'])
 def search():
@@ -87,8 +94,6 @@ def search():
     trail_id = request.form.get('trail-choice')
     trail_name = crud.get_trail_name_with_trail_id(trail_id)
     trailpoint_list = crud.get_trailpoint_list_with_trail_id(trail_id)
-    # get list of lats and longs from 
-    session['lnglat_list'] = helper.get_lnglat_tuples(trailpoint_list)
 
     # get requested distance from trail in miles
     miles = request.form.get('fire-distance')
