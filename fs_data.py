@@ -217,3 +217,13 @@ def get_region_places(region_coord_file=region_coord_file):
         hq = placemark.select_one('[name="REGIONHEADQUARTERS"]').text
         region_places.append({'id': id, 'place': hq})
     return region_places
+
+
+def filter_admin_boundaries(file=forest_file, region_id='03'):
+    geojson = get_geojson(file)
+    newfeatures = []
+    for feature in geojson['features']:
+        if feature['properties']['REGION'] == region_id:
+            features.append(feature)
+    geojson['features'] = newfeatures
+    return geojson
