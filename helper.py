@@ -1,9 +1,14 @@
 """ file for helper functions """
-from datetime import date
+import datetime
+import time
 import crud
 from os import environ
 import requests
 import re
+from dotenv import load_dotenv
+from os import environ
+
+load_dotenv()
 
 
 #---------------------------------------------------------------------#
@@ -120,13 +125,13 @@ def get_str_from_date(day):
     return day.strftime('%Y/%m/%d')
 
 def get_today_str():
-    return date.today().strftime('%Y/%m/%d')
+    return datetime.date.today().strftime('%Y/%m/%d')
 
 def get_date_from_str(day):
-    return date(int(day[:4]), int(day[5:7]), int(day[8:]))
+    return datetime.date(int(day[:4]), int(day[5:7]), int(day[8:]))
 
 def fires_are_old():
-    current_day = date.today()
+    current_day = datetime.date.today()
     old_day = get_date_from_str(crud.get_last_db_update())
     print(f'{current_day=}, {old_day=}')
     # difference in days
@@ -169,14 +174,15 @@ def generate_district_dict(district_id):
 
     return {'trails': trails}
 
-def generate_trail_dict(trail_id):
+def generate_trail_dict(trail_id, openweatherkey):
     trail_name = crud.get_trail_name_with_trail_id(trail_id)
     trailpoint_list = crud.get_trailpoint_list_with_trail_id(trail_id)
     trailhead = [trailpoint_list[0].longitude, trailpoint_list[0].latitude]
     nearby_fires = get_nearby_fires(trailpoint_list, 25)
     fires = [{'id': fire.fire_id, 'name': fire.fire_name, 'url': fire.fire_url, 'longitude': fire.longitude, 'latitude': fire.latitude} for fire in nearby_fires]
+    aqi = get_aqi_info(trailhead, openweatherkey)
 
-    return {'fires': fires, 'trail_name': trail_name, 'trailhead': trailhead}
+    return {'fires': fires, 'trail_name': trail_name, 'trailhead': trailhead, 'aqi': aqi}
 
 # for updating tables
 def get_lnglat_for_place(place):
@@ -200,3 +206,49 @@ def get_lnglat_for_place(place):
         return [lng, lat]
     print('********** COULD NOT FIND COORDINATES **********')
 
+
+def get_aqi_info(lnglat, openweatherkey):
+    long, lat = lnglat
+    response = requests.get(f'http://api.openweathermap.org/data/2.5/air_pollution?lat={lat}&lon={long}&appid={openweatherkey}')
+    print(response)
+    json_info = response.json()
+    print(json_info)
+    aqi = json_info['list'][0]['main']['aqi']
+    print(f'********{aqi}*******')
+    return aqi
+
+def get_weather_info(lnglat, year = 2023, month=int(datetime.date.today().strftime('%m')), day=int(datetime.date.today().strftime('%d')), openweatherkey=environ['OPENWEATHERAPIKEY']):
+    long, lat = lnglat
+    today = time.mktime(datetime.date.today().timetuple())
+    date_given = time.mktime(datetime.date(year, month, day).timetuple())
+    date_diff = int((date_given - today)/ 86400)
+    weather_info = {}
+    if 0 <= date_diff <= 8:
+        response = requests.get(f'https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={long}&exclude=current,minutely,hourly&units=imperial&appid={openweatherkey}')
+        current_weather = response.json()
+        weather = current_weather['daily'][date_diff]
+        weather_info['current'] = {'high': weather['temp']['max'], 'low': weather['temp']['min'], 'humidity': weather['humidity'], 'wind_speed': weather['wind_speed'], 'description': weather['weather'][0]['description']}
+    temp = 0 
+    humidity = 0
+    wind_speed = 0 
+    description = []
+    for yr in range(2018, 2023):
+        print(yr)
+        date_given_2022 = int(time.mktime(datetime.date(yr, month, day).timetuple()))
+        historic_response = requests.get(f'https://api.openweathermap.org/data/3.0/onecall/timemachine?lat={lat}&lon={long}&dt={date_given_2022}&units=imperial&appid={openweatherkey}')
+        historic_weather = historic_response.json()
+        historic = historic_weather['data'][0]
+        temp += historic['temp'] 
+        humidity += historic['humidity']
+        wind_speed += historic['wind_speed']
+        description.append(historic['weather'][0]['description'])
+    weather_info['historic'] = {'temp': temp/5, 'humidity': humidity/5, 'wind_speed': wind_speed/5, 'description': set(description)}
+    return weather_info
+
+def get_today():
+    return datetime.date.today().strftime('%Y-%m-%d')
+
+def get_next_year():
+    today = datetime.date.today()
+    next_year = today.replace(year = today.year + 1)
+    return next_year.strftime('%Y-%m-%d')
