@@ -39,8 +39,11 @@ def index():
         crud.update_fires()
     else:
         print('+++++++++++ NO UPDATE NEEDED +++++++++++')
+    
+    today = helper.get_today()
+    next_year = helper.get_next_year()
 
-    return render_template("index.html")
+    return render_template("index.html", today = today, next_year = next_year)
 
 
 @app.route("/initialize")
@@ -83,7 +86,8 @@ def set_district():
 def set_trail():
 
     trail_id = request.args.get('trail')
-    trail_dict = helper.generate_trail_dict(trail_id)
+    openweatherkey = environ['OPENWEATHERAPIKEY']
+    trail_dict = helper.generate_trail_dict(trail_id, openweatherkey)
 
     return jsonify(trail_dict)
 
@@ -117,16 +121,25 @@ def publish_geojson_regions():
 
 @app.route('/forests.geojson')
 def publish_geojson_forests():
+    # TODO only get forest info that corresponds to given region
     forest_json = fs_data.get_geojson(fs_data.forest_file)
     return forest_json
 
 @app.route('/districts.geojson')
 def publish_geojson_districts():
+    # TODO only get district info that corresponds to given forest 
     district_json = fs_data.get_geojson(fs_data.district_file)
     return district_json
 
 @app.route('/trails.geojson')
 def publish_geojson_trails():
+    # TODO only get forest info that corresponds to given trails 
+    trail_json = fs_data.get_geojson(fs_data.trail_file)
+    return trail_json
+
+@app.route('/trail.geojson')
+def publish_single_geojson_trail():
+    ## TODO filter out geojson data to only return the trail I want
     trail_json = fs_data.get_geojson(fs_data.trail_file)
     return trail_json
 
