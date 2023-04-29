@@ -459,6 +459,7 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
             const fires = data.fires
             const trail_name = data.trail_name
             const trailhead = data.trailhead
+            const aqi = data.aqi
 
             // reset fire information
             document.querySelector('#trail-and-fire-info').innerHTML = ""
@@ -483,6 +484,10 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                 document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
                     `</ul`)
             }
+
+            // add AQI data
+            document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
+                    `</p> The AQI at ${trail_name} is currently ${aqi} on a scale of 1 (good) to 5 (very poor).`)
 
             // create new map centering on beginning of trail
             const map = new mapboxgl.Map({
@@ -604,12 +609,13 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                         'line-join': 'round',
                         'line-cap': 'round'
                     },
-                        'paint': {
+                    'paint': {
                         'line-color': '#000',
                         'line-width': 10
-                    }
+                    },
+                    'filter': ['in', 'TRAIL_CN', `${trail}`]
                 });
-                map.setFilter(`trail-route`, ['==', ['get', 'TRAIL_CN'], `${trail}`]);
+                // map.setFilter(`trail-route`, ['==', ['get', 'TRAIL_CN'], `${trail}`]);
                 console.log(map.getLayer('trail-route'))
                 });
 
