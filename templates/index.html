@@ -35,6 +35,12 @@
         </select>
     </fieldset>
     <fieldset>
+        <legend>Trip date:</legend>
+
+        <input type="date" id="trip-date" name="trip-start" min={{ today }} max={{next_year}} required pattern="\d{4}-\d{2}-\d{2}">
+    </fieldset>
+
+    <!-- <fieldset>
         <legend>Fire Range</legend>
         <label for="fire-distance"> How many miles from the trail do you want to check for fires?</label>
         <input type="text" name="fire-distance" id="fire-distance" placeholder="25">
@@ -42,7 +48,7 @@
     <fieldset>
         <legend>Search</legend>
         <input type='submit' value="Search">
-    </fieldset>
+    </fieldset> -->
 </form>
 
 <section id="all-the-maps">
@@ -65,7 +71,7 @@
 
 </section>
 
-<section id="trail-fire-info">
+<section id="trail-info">
 
 </section>
     
