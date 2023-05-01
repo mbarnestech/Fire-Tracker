@@ -1,13 +1,14 @@
 # import Python modules
-import os
 from datetime import datetime
+import os
 
 # import local modules
 import crud
+import fire_data
+import fs_data
 import model
 import server
-import fs_data
-import fire_data
+
 
 #---------------------------------------------------------------------#
 def regenerate_db():

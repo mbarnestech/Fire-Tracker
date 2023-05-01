@@ -1,14 +1,15 @@
 # import Python modules
-from flask import Flask, render_template, redirect, flash, session, request, jsonify
 from dotenv import load_dotenv
-from os import environ
+from flask import Flask, render_template, session, request, jsonify
 import jinja2
+from os import environ
+
 
 # import local modules
-from model import connect_to_db, db
 import crud
-import helper
 import fs_data
+import helper
+from model import connect_to_db, db
 
 #---------------------------------------------------------------------#
 

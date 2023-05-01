@@ -3,9 +3,9 @@
 # using RSS feed to get xml data at https://inciweb.nwcg.gov/incidents/rss.xml
 
 #import Python modules
-import requests
 from bs4 import BeautifulSoup
 import re
+import requests
 
 #import local modules
 import helper

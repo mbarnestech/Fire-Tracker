@@ -1,11 +1,12 @@
 """get data for region, forest and district, and trail data"""
 
 # import Python modules
+from bs4 import BeautifulSoup
 from csv import DictReader
 import geojson
 import re
-from bs4 import BeautifulSoup
 
+# import local modules
 import crud
 
 #---------------------------------------------------------------------#

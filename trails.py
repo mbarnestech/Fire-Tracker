@@ -2,9 +2,10 @@
 
 # import Python modules
 from bs4 import BeautifulSoup
+import re
 import requests
 import sys
-import re
+
 
 #  temp for test file
 # with open('./testcode/testscrape.html') as file:

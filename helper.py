@@ -1,12 +1,15 @@
 """ file for helper functions """
+
+# import Python modules
 import datetime
-import time
-import crud
-from os import environ
-import requests
-import re
 from dotenv import load_dotenv
 from os import environ
+import re
+import requests
+import time
+
+# import local modules
+import crud
 
 load_dotenv()
 

@@ -1,10 +1,11 @@
 """CRUD functions live here"""
 
 # import local modules
-from model import Region, Forest, District, Trail, TrailPoint, Fire, RegionCoord, ForestCoord, DistrictCoord,db, connect_to_db
-import helper
 import fire_data
 import fs_data
+import helper
+from model import Region, Forest, District, Trail, TrailPoint, Fire, RegionCoord, ForestCoord, DistrictCoord,db, connect_to_db
+
 
 #---------------------------------------------------------------------#
 # CREATE
