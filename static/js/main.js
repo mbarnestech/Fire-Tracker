@@ -305,7 +305,7 @@ document.querySelector('#forest-choice').addEventListener('input', (evt) => {
                 map.addSource(
                     'districts', {
                         'type': 'geojson',
-                        'data': '/districts.geojson'
+                        'data': `/districts.geojson${forest}`
                     });
 
                 // add fill color to districts
@@ -393,7 +393,7 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
                 map.addSource(
                     'trails', {
                         'type': 'geojson',
-                        'data': '/trails.geojson'
+                        'data': `/trails.geojson${district}`
                     });
 
                 // add fill color to trails
@@ -452,7 +452,8 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
 
 document.querySelector('#trail-choice').addEventListener('input', (evt) => {
     const trail = `?trail=${evt.target.value}`
-    fetch(`/trail${trail}`)
+    const distance = `${document.getElementById('fire-distance').value}`
+    fetch(`/trail${trail}&distance=${distance}`)
         .then((response) => response.json())
         .then((data) => {
             const fires = data.fires
@@ -486,7 +487,7 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
 
             // add AQI data
             document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
-                    `</p> The AQI at ${trail_name} is currently ${aqi} on a scale of 1 (good) to 5 (very poor).`)
+                    `<p> The AQI at ${trail_name} is currently ${aqi} on a scale of 1 (good) to 5 (very poor).</p>`)
 
             // create new map centering on beginning of trail
             const map = new mapboxgl.Map({
@@ -619,5 +620,23 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                 });
 
       
+        });
+});
+
+
+document.querySelector('#trip-date').addEventListener('input', (evt) => {
+    const date = `${evt.target.value}`
+    const trail = `${document.getElementById('trail-choice').value}`
+    console.log(`date=${date}, trail=${trail}`)
+    fetch(`/weather?date=${date}&trail=${trail}`)
+        .then((response) => response.json())
+        .then((data) => {
+            if ('current' in data){
+                document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
+                `<p> The weather is currently ${data.current.description}</p>`)
+            } 
+            document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
+            `<p> Over the last five years, the weather on ${date} has been ${data.historic.description}</p`)
+
         });
 });

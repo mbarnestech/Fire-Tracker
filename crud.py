@@ -4,43 +4,27 @@
 import fire_data
 import fs_data
 import helper
-from model import Region, Forest, District, Trail, TrailPoint, Fire, RegionCoord, ForestCoord, DistrictCoord,db, connect_to_db
+from model import Region, Forest, District, Trail, Fire, db, connect_to_db
 
 
 #---------------------------------------------------------------------#
 # CREATE
 
-def create_region(region_id, region_name):
+def create_region(region_id, region_name, long, lat):
     """Create and return a new region."""
-    return Region(region_id=region_id, region_name=region_name)
+    return Region(region_id=region_id, region_name=region_name, long=long, lat=lat)
 
-def create_region_coords(region_id, latitude, longitude):
-    """Create and return a new region coordinate"""
-    return RegionCoord(region_id=region_id, latitude=latitude, longitude=longitude)
-
-def create_forest(forest_id, forest_name, region_id):
+def create_forest(forest_id, forest_name, region_id, is_forest_empty, long, lat):
     """Create and return a new forest."""
-    return Forest(forest_id=forest_id, forest_name=forest_name, region_id=region_id)
+    return Forest(forest_id=forest_id, forest_name=forest_name, region_id=region_id, is_forest_empty=is_forest_empty, long=long, lat=lat)
 
-def create_forest_coords(forest_id, polygon_no, latitude, longitude):
-    """Create and return a new forest coordinate"""
-    return ForestCoord(forest_id=forest_id, polygon_no=polygon_no, latitude=latitude, longitude=longitude)
-
-def create_district(district_id, district_name, region_id, forest_id):
+def create_district(district_id, district_name, region_id, forest_id, is_district_empty, long, lat):
     """Create and return a new district."""
-    return District(district_id=district_id, district_name=district_name, region_id=region_id, forest_id=forest_id)
+    return District(district_id=district_id, district_name=district_name, region_id=region_id, forest_id=forest_id, is_district_empty=is_district_empty, long=long, lat=lat)
 
-def create_district_coords(district_id, polygon_no, latitude, longitude):
-    """Create and return a new district coordinate"""
-    return DistrictCoord(district_id=district_id, polygon_no=polygon_no, latitude=latitude, longitude=longitude)
-
-def create_trail(trail_id, trail_no, trail_name, region_id, forest_id, district_id):
+def create_trail(trail_id, trail_no, trail_name, region_id, forest_id, district_id, is_trail_empty, th_long, th_lat):
     """Create and return a new trail."""
-    return Trail(trail_id=trail_id, trail_no=trail_no, trail_name=trail_name, region_id=region_id, forest_id=forest_id, district_id=district_id)
-
-def create_trail_point(trail_id, latitude, longitude):
-    """Create and return a new trail point"""
-    return TrailPoint(trail_id=trail_id, latitude=latitude, longitude=longitude)
+    return Trail(trail_id=trail_id, trail_no=trail_no, trail_name=trail_name, region_id=region_id, forest_id=forest_id, district_id=district_id, is_trail_empty=is_trail_empty, th_long=th_long, th_lat=th_lat)
 
 def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_updated, size, contained, db_updated):
     """Create and return a new fire."""
@@ -54,10 +38,6 @@ def create_fire(fire_url, fire_name, latitude, longitude, incident_type, last_up
 def get_regions():
     """return a list of all Region objects"""
     return Region.query.all()
-
-def get_region_coords():
-    """return a list of all RegionCoord objects"""
-    return RegionCoord.query.all()
 
 def get_districts():
     """return a list of all District objects"""
@@ -107,10 +87,6 @@ def get_trails_by_district(district_id):
 
 # For calculating distance from trail to fires
 
-def get_trailpoint_list_with_trail_id(trail_id):
-    """return a list of TrailPoint objects corresponding to a trail name"""
-    return TrailPoint.query.filter_by(trail_id = trail_id).all()
-
 def get_fires_with_fire_ids(fires):
     """get list of Fire objects corresponding to list of fire_id numbers"""
     fire_list = []
@@ -123,6 +99,12 @@ def get_trail_with_trail_name(trail_name):
     """return single Trail instance with trail_name attribute"""
     return Trail.query.filter_by(trail_name = trail_name).one()
 
+def get_trail_with_trail_id(trail_id):
+    """return single Trail instance with trail_name attribute"""
+    return Trail.query.filter_by(trail_id = trail_id).one()
+
+
+
 def get_trail_name_with_trail_id(trail_id):
     return db.session.query(Trail.trail_name).filter(Trail.trail_id == trail_id).first()[0]
 
@@ -134,9 +116,6 @@ def get_district_ids():
 
 def get_forest_ids():
     return [forest[0] for forest in db.session.query(Forest.forest_id).all()]
-
-def trailpoint_in_trail(trail_id):
-    return TrailPoint.query.filter_by(trail_id = trail_id).first()
 
 def trail_in_district(district):
     return Trail.query.filter_by(district_id = district, is_trail_empty = False).first()
@@ -186,19 +165,7 @@ def update_fires():
                 ))
     db.session.commit()
     print(f'******* FIRE TABLE UPDATED *******')
-    
-def set_trails_to_empty():
-    """set trails with no associated trailpoints to empty"""
-    trails = get_trail_ids()
-    for trail in trails[:]:
-        if trailpoint_in_trail(trail):
-            continue
-        else:
-            db.session.query(Trail).filter(Trail.trail_id == trail).update(
-                {"is_trail_empty": True}, synchronize_session="fetch")
-            print(trail, db.session.query(Trail.is_trail_empty).filter(Trail.trail_id == trail).first())
-    db.session.commit()
-    print(f'******* TRAILS TABLE UPDATED *******')
+
     
 def set_districts_to_empty():
     """set districts containing only empty trails to empty"""
@@ -226,48 +193,7 @@ def set_forests_to_empty():
     db.session.commit()
     print(f'******* FORESTS TABLE UPDATED *******')
 
-def add_latlong_to_regions():
-    region_places = fs_data.get_region_places()
-    for region in region_places:
-        long, lat = helper.get_lnglat_for_place(region['place'])
-        db.session.query(Region).filter(Region.region_id == region['id']).update(
-                {'lat': lat, 'long': long}, synchronize_session="fetch")
-    db.session.commit()
-    print(f'******* REGIONS TABLE UPDATED *******')
 
-def add_latlong_to_forests():
-    forests = get_forests()
-    for forest in forests:
-        long, lat = helper.get_lnglat_for_place(forest.forest_name)
-        db.session.query(Forest).filter(Forest.forest_id == forest.forest_id).update(
-                {'lat': lat, 'long': long}, synchronize_session="fetch")
-    db.session.commit()
-    print(f'******* FORESTS TABLE UPDATED *******')
-
-def add_latlong_to_districts():
-    districts = get_districts()
-    for district in districts:
-        print(district.district_name)
-        lnglat = helper.get_lnglat_for_place(district.district_name)
-        if lnglat:
-            long, lat = lnglat
-        else:
-            forest = Forest.query.filter_by(forest_id = district.forest_id).first()
-            long = forest.long
-            lat = forest.lat
-        db.session.query(District).filter(District.district_id == district.district_id).update(
-                    {'lat': lat, 'long': long}, synchronize_session="fetch")
-    db.session.commit()
-    print(f'******* DISTRICTS TABLE UPDATED *******')
-
-
-def add_latlong_to_trails():
-    th_data = fs_data.get_trailheads()
-    for trail in th_data:
-        db.session.query(Trail).filter(Trail.trail_id == trail.id).update(
-                {'lat': trail.th_lat, 'long': trail.th_long}, synchronize_session="fetch")
-    db.session.commit()
-    print(f'******* FORESTS TABLE UPDATED *******')
 #---------------------------------------------------------------------#
 
 # Connect to database when running crud.py interactively

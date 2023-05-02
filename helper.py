@@ -7,6 +7,8 @@ from os import environ
 import re
 import requests
 import time
+from flask import Flask, render_template, session, request, jsonify
+
 
 # import local modules
 import crud
@@ -50,23 +52,6 @@ def get_latlong_float(latlong):
 #---------------------------------------------------------------------#
 # SERVER.PY
 
-def get_maxmin_latlong(points):
-    """get the maximum and minimum latitude and longitude of a trail
-    
-    points is a list of TrailPoint objects
-    """
-
-    max_lat = points[0].latitude
-    min_lat = max_lat
-    max_long = points[0].longitude
-    min_long = max_long
-    for point in points:
-        max_lat = max(point.latitude, max_lat)
-        min_lat = min(point.latitude, min_lat)
-        max_long = max(point.longitude, max_long)
-        min_long = min(point.longitude, min_long)
-    return (min_lat, max_lat, min_long, max_long)
-
 def get_lnglat_tuples(points):
     """create a list of (longitude, latitude) tuples for a set of points"""
     lnglat_list = []
@@ -75,7 +60,7 @@ def get_lnglat_tuples(points):
     return lnglat_list
 
 
-def get_fire_search_boundaries(maxmin_latlong, miles):
+def get_fire_search_boundaries(lnglat, miles):
     """return fire search boundaries """
     
     # use 1 deg latitude = 69 miles and 1 deg longitude = 54.6 miles to get radius in lat/long
@@ -83,23 +68,18 @@ def get_fire_search_boundaries(maxmin_latlong, miles):
     lat_offset = miles/69
     long_offset = miles/54.6
     #unpack maxmin_latlong
-    min_lat, max_lat, min_long, max_long = maxmin_latlong
+    long, lat = lnglat
     
     # create min/max lat/long boundaries for fire search
-    min_lat -= lat_offset
-    max_lat += lat_offset
-    min_long -= long_offset
-    max_long += long_offset
+    min_lat = lat - lat_offset
+    max_lat = lat + lat_offset
+    min_long = long - long_offset
+    max_long = long + long_offset
 
     return (min_lat, max_lat, min_long, max_long)
 
-
-def get_nearby_fires(trailpoint_list, miles):
-    """get list of Fire instances for fires within requested miles of trail"""
-    # get maximum and minimum latitude and longitude of the trail
-    maxmin_latlong = get_maxmin_latlong(trailpoint_list)
-    # get maximum and minimum latitude and longitude for fire search
-    min_lat, max_lat, min_long, max_long = get_fire_search_boundaries(maxmin_latlong, miles)
+def get_nearby_fires(lnglat, distance):
+    min_lat, max_lat, min_long, max_long = get_fire_search_boundaries(lnglat, distance)
     # create empty nearby_fires list
     nearby_fires = []
     # get list of fires
@@ -177,15 +157,21 @@ def generate_district_dict(district_id):
 
     return {'trails': trails}
 
-def generate_trail_dict(trail_id, openweatherkey):
-    trail_name = crud.get_trail_name_with_trail_id(trail_id)
-    trailpoint_list = crud.get_trailpoint_list_with_trail_id(trail_id)
-    trailhead = [trailpoint_list[0].longitude, trailpoint_list[0].latitude]
-    nearby_fires = get_nearby_fires(trailpoint_list, 25)
+def generate_trail_dict(trail_id, openweatherkey, distance='25'):
+    int_distance = int(distance)
+    trail = crud.get_trail_with_trail_id(trail_id)
+    trail_name = trail.trail_name
+    trailhead = [trail.th_long, trail.th_lat]
+    nearby_fires = get_nearby_fires(trailhead, int_distance)
     fires = [{'id': fire.fire_id, 'name': fire.fire_name, 'url': fire.fire_url, 'longitude': fire.longitude, 'latitude': fire.latitude} for fire in nearby_fires]
     aqi = get_aqi_info(trailhead, openweatherkey)
+    print(f'##### aqi = {aqi}')
+    weather_info = get_weather_info(trailhead, openweatherkey)
+    print(f'%%%%% weather = {weather_info}')
 
-    return {'fires': fires, 'trail_name': trail_name, 'trailhead': trailhead, 'aqi': aqi}
+    return {'fires': fires, 'trail_name': trail_name, 'trailhead': trailhead, 'aqi': aqi, 'weather_info': weather_info}
+
+# , 'weather_info': weather_info
 
 # for updating tables
 def get_lnglat_for_place(place):
@@ -229,10 +215,10 @@ def get_aqi_info(lnglat, openweatherkey):
     print(f'********{aqi}*******')
     return aqi
 
-def get_weather_info(lnglat, year = 2023, month=int(datetime.date.today().strftime('%m')), day=int(datetime.date.today().strftime('%d')), openweatherkey=environ['OPENWEATHERAPIKEY']):
+def get_weather_info(lnglat, openweatherkey, date = datetime.date.today()):
     long, lat = lnglat
     today = time.mktime(datetime.date.today().timetuple())
-    date_given = time.mktime(datetime.date(year, month, day).timetuple())
+    date_given = time.mktime(date.timetuple())
     date_diff = int((date_given - today)/ 86400)
     weather_info = {}
     if 0 <= date_diff <= 8:
@@ -244,17 +230,20 @@ def get_weather_info(lnglat, year = 2023, month=int(datetime.date.today().strfti
     humidity = 0
     wind_speed = 0 
     description = []
+    month = int(date.strftime('%m'))
+    day = int(date.strftime('%d'))
     for yr in range(2018, 2023):
         print(yr)
         date_given_2022 = int(time.mktime(datetime.date(yr, month, day).timetuple()))
         historic_response = requests.get(f'https://api.openweathermap.org/data/3.0/onecall/timemachine?lat={lat}&lon={long}&dt={date_given_2022}&units=imperial&appid={openweatherkey}')
         historic_weather = historic_response.json()
+        print(f'*****${historic_weather}')
         historic = historic_weather['data'][0]
         temp += historic['temp'] 
         humidity += historic['humidity']
         wind_speed += historic['wind_speed']
         description.append(historic['weather'][0]['description'])
-    weather_info['historic'] = {'temp': temp/5, 'humidity': humidity/5, 'wind_speed': wind_speed/5, 'description': set(description)}
+    weather_info['historic'] = {'temp': temp/5, 'humidity': humidity/5, 'wind_speed': wind_speed/5, 'description': list(set(description))}
     return weather_info
 
 def get_today():
@@ -264,3 +253,10 @@ def get_next_year():
     today = datetime.date.today()
     next_year = today.replace(year = today.year + 1)
     return next_year.strftime('%Y-%m-%d')
+
+def get_weather_dict(date, trail_id, openweatherkey):
+    dt_date = get_date_from_str(date)
+    trail = crud.get_trail_with_trail_id(trail_id)
+    lnglat = [trail.th_long, trail.th_lat]
+    weather = get_weather_info(lnglat, openweatherkey, dt_date)
+    return weather

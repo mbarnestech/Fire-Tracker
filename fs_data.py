@@ -9,187 +9,27 @@ import re
 # import local modules
 import crud
 import model
+import helper
 
 #---------------------------------------------------------------------#
+# FOR SEEDING IN INTERACTIVE SEED.PY
 
-# FOR SEEDING IN SEED.PY
 # regions = fs_data.get_regions_list(fs_data.region_file)
 # forests, districts = fs_data.get_forests_districts_lists(fs_data.forest_district_file)
-# trails, trail_points = fs_data.get_trails_trail_points_lists(fs_data.trail_file)
-# region_coords = fs_data.get_region_coords()
-# forest_coords = fs_data.get_forest_coords()
-# district_coords = fs_data.get_district_coords()
+# trails = fs_data.get_trail_list(fs_data.trail_file)
 
+#---------------------------------------------------------------------#
+# SOURCE FILES
 
-
-
-# current location of region csv file
 region_file = 'seed_data/FS_Regions.csv'
-
-def get_regions_list(region_file):
-    with open(region_file) as file:
-        csv_reader = DictReader(file, delimiter='\t')
-        regions = []
-        for region in csv_reader:
-            regions.append({'region_id': region['Region'], 'region_name': region['Name']})
-    return regions
-
-# current location of district csv file
 forest_district_file = 'seed_data/FS_Ranger_District_Boundaries.csv'
-
-def get_forests_districts_lists(forest_district_file):
-    with open(forest_district_file) as file:
-        csv_reader = DictReader(file)
-        forests = []
-        districts = []
-        for row in csv_reader:
-            region_id = row['REGION']
-            forest_num = row['FORESTNUMBER']
-            district_num = row['DISTRICTNUMBER']
-            forest_id = region_id + forest_num
-            district_id = forest_id + district_num            
-            forests.append({'forest_id': forest_id, 'region_id': region_id, 'forest_name': row['FORESTNAME'], 'is_forest_empty': False})
-            districts.append({'district_id': district_id, 'forest_id': forest_id, 'region_id': region_id, 'district_name': row['DISTRICTNAME'],'is_district_empty': False})
-    return [forests, districts]
-
-# current location of FS Trails geojson File
 trail_file = 'seed_data/National_Forest_System_Trails_(Feature_Layer).geojson'
+region_geojson = 'seed_data/Forest_Service_Regional_Boundaries_(Feature_Layer).geojson'
+forest_geojson = 'seed_data/Forest_Administrative_Boundaries_(Feature_Layer).geojson'
+district_geojson = 'seed_data/Ranger_District_Boundaries_(Feature_Layer).geojson'
 
-def get_trails_trail_points_lists(trail_file):
-    """get list for seeding both trails and trail points"""
-    with open(trail_file) as file:
-        trailset = geojson.load(file)
-        trails = []
-        trail_points = []
-        for trail in trailset[:]:
-            if (trail['properties']['ADMIN_ORG'] and 
-                trail['properties']['TRAIL_NAME'] and
-                trail['properties']['TRAIL_CN'] not in [trail['trail_id'] for trail in trails] and
-                len(trail['properties']['ADMIN_ORG']) == 6
-                ):
-                trails.append({'trail_id': trail['properties']['TRAIL_CN'], 
-                               'trail_no': trail['properties']['TRAIL_NO'], 
-                               'trail_name': trail['properties']['TRAIL_NAME'], 
-                               'region_id': trail['properties']['ADMIN_ORG'][:2], 
-                               'forest_id': trail['properties']['ADMIN_ORG'][:4], 
-                               'district_id': trail['properties']['ADMIN_ORG'],
-                               'is_trail_empty': False})
-                for coordinate in trail['geometry']['coordinates']:
-                    if type(coordinate[0]) == float and type(coordinate[1]) == float:
-                        trail_points.append({'trail_id': trail['properties']['TRAIL_CN'],
-                                            'longitude': coordinate[0],
-                                            'latitude': coordinate[1]})
-                    else:
-                        removed = trails.pop()
-                        print(f'***** REMOVED ****** {removed}')
-                        break
-
-    return [trails, trail_points]
-
-def get_trails_only(trail_file):
-    """get list for seeding only trails"""
-    with open(trail_file) as file:
-        trailset = geojson.load(file)
-        trails = []
-        districts = get_district_ids()
-        district_set = set(districts)
-        for trail in trailset[:]:
-            if (trail['properties']['ADMIN_ORG'] and 
-                trail['properties']['TRAIL_NAME'] and
-                trail['properties']['TRAIL_CN'] not in [trail['trail_id'] for trail in trails] and
-                len(trail['properties']['ADMIN_ORG']) == 6 and
-                trail['properties']['ADMIN_ORG'] in district_set and
-                trail['geometry']['coordinates']
-                ):
-                trails.append({'trail_id': trail['properties']['TRAIL_CN'], 
-                               'trail_no': trail['properties']['TRAIL_NO'], 
-                               'trail_name': trail['properties']['TRAIL_NAME'], 
-                               'region_id': trail['properties']['ADMIN_ORG'][:2], 
-                               'forest_id': trail['properties']['ADMIN_ORG'][:4], 
-                               'district_id': trail['properties']['ADMIN_ORG'],
-                               'is_trail_empty': False})
-
-    return trails
-    
-def get_soup_from_file(kml_file):
-    """get soup from kml file"""
-    with open(kml_file) as file:
-        return BeautifulSoup(file, 'xml')
-
-# current location of regional boundaries kml file
-region_coord_file = 'seed_data/Forest_Service_Regional_Boundaries_(Feature_Layer).kml'
-
-def get_region_coords(region_coord_file=region_coord_file):
-    """get list of coordinate dictionaries for each region"""
-    
-    soup = get_soup_from_file(region_coord_file)
-
-    placemarks = soup.find_all('Placemark') 
-    region_coords = []       
-    for placemark in placemarks[:]:
-        coords = placemark.find('coordinates').string[:].split()
-        for coord in coords[:]:
-            latitude, longitude = coord.split(',')
-            region_coords.append({'region_id': placemark.select_one('[name="REGION"]').text,
-                                  'latitude': float(latitude),
-                                  'longitude': float(longitude)})
-    return region_coords
-
-
-# current location of forest boundaries kml file
-forest_coord_file = 'seed_data/Forest_Administrative_Boundaries_(Feature_Layer).kml'
-
-def get_forest_coords(forest_coord_file=forest_coord_file):
-    soup = get_soup_from_file(forest_coord_file)
-    forest_coords = []
-    forest_ids = crud.get_forest_ids()
-    placemarks = soup.find_all('Placemark') 
-    print(len(placemarks))
-    for placemark in placemarks[:]:
-        if placemark.select_one('[name="FORESTORGCODE"]').text in forest_ids:
-            polygons = placemark.find_all('coordinates')
-            count = 1
-            if polygons:
-                for polygon in polygons[:]:
-                    coords = polygon.string[:].split()
-                    for coord in coords[:]:
-                        latitude, longitude = coord.split(',')
-                        forest_coords.append({'forest_id': placemark.select_one('[name="FORESTORGCODE"]').text,
-                                    'polygon_no': count,
-                                    'latitude': float(latitude),
-                                    'longitude': float(longitude)})
-                    count += 1
-    return forest_coords
-
-
-# current location of district boundaries kml file
-district_coord_file = 'seed_data/Ranger_District_Boundaries_(Feature_Layer).kml'
-
-def get_district_coords(district_coord_file=district_coord_file):
-    soup = get_soup_from_file(district_coord_file)
-    district_coords = []
-    district_ids = crud.get_district_ids()
-    placemarks = soup.find_all('Placemark') 
-    print(len(placemarks))
-    for placemark in placemarks[:]:
-        if placemark.select_one('[name="DISTRICTORGCODE"]').text in district_ids:
-            polygons = placemark.find_all('coordinates')
-            count = 1
-            if polygons:
-                for polygon in polygons[:]:
-                    coords = polygon.string[:].split()
-                    for coord in coords[:]:
-                        latitude, longitude = coord.split(',')
-                        district_coords.append({'district_id': placemark.select_one('[name="DISTRICTORGCODE"]').text,
-                                    'polygon_no': count,
-                                    'latitude': float(latitude),
-                                    'longitude': float(longitude)})
-                    count += 1
-    return district_coords
-
-region_file = 'seed_data/Forest_Service_Regional_Boundaries_(Feature_Layer).geojson'
-forest_file = 'seed_data/Forest_Administrative_Boundaries_(Feature_Layer).geojson'
-district_file = 'seed_data/Ranger_District_Boundaries_(Feature_Layer).geojson'
+#---------------------------------------------------------------------#
+# OPEN FILES
 
 def get_geojson(file):
     """get geojson"""
@@ -197,6 +37,115 @@ def get_geojson(file):
         geojson_info = geojson.load(file)
     return geojson_info
 
+def get_soup_from_file(kml_file):
+    """get soup from kml file"""
+    with open(kml_file) as file:
+        return BeautifulSoup(file, 'xml')
+    
+#---------------------------------------------------------------------#
+# SEED FUNCTIONS
+
+def get_regions_list(file):
+    """get list for seeding regions"""
+    with open(file) as file:
+        region_info = DictReader(file, delimiter='\t')
+        regions = []
+        for region in region_info:
+            long, lat = helper.get_lnglat_for_place(region['Headquarters'])
+            regions.append({'region_id': region['Region'], 
+                            'region_name': region['Name'],
+                            'long': long,
+                            'lat': lat
+                            })
+    return regions
+
+
+def get_forests_districts_lists(file):
+    """get lists for seeding forests and districts"""
+    with open(file) as file:
+        forest_info = DictReader(file, delimiter=',')
+        forests = []
+        districts = []
+        for row in forest_info:
+            region_id = row['REGION']
+            forest_num = row['FORESTNUMBER']
+            district_num = row['DISTRICTNUMBER']
+            forest_id = region_id + forest_num
+            district_id = forest_id + district_num
+            flong, flat = helper.get_lnglat_for_place(row['FORESTNAME'])
+            forests.append({'forest_id': forest_id, 
+                            'region_id': region_id, 
+                            'forest_name': row['FORESTNAME'], 
+                            'is_forest_empty': False,
+                            'long': flong,
+                            'lat': flat
+                            })
+            dlnglat = helper.get_lnglat_for_place(row['DISTRICTNAME'])
+            if dlnglat:
+                dlong, dlat = dlnglat
+            else:
+                dlong = flong
+                dlat = flat
+            districts.append({'district_id': district_id, 
+                            'forest_id': forest_id, 
+                            'region_id': region_id, 
+                            'district_name': row['DISTRICTNAME'],
+                            'is_district_empty': False,
+                            'long': dlong,
+                            'lat': dlat})
+    return [forests, districts]
+
+def get_trail_list(trail_file):
+    """get list for seeding trails"""
+     
+    trailset = get_geojson(trail_file)
+    trails = []
+    district_ids = set(crud.get_district_ids())
+    for trail in trailset[:]:
+        if (trail['properties']['ADMIN_ORG'] and 
+            trail['properties']['TRAIL_NAME'] and
+            trail['properties']['TRAIL_CN'] not in [trail['trail_id'] for trail in trails] and
+            len(trail['properties']['ADMIN_ORG']) == 6 and
+            trail['properties']['ADMIN_ORG'] in district_ids
+            ):
+            if (trail['geometry']['coordinates'] and 
+                type(trail['geometry']['coordinates'][0][0]) == float
+                ):
+                th_long = trail['geometry']['coordinates'][0][0]
+                th_lat = trail['geometry']['coordinates'][0][1]
+            else:
+                district = crud.get_district_by_id(trail['properties']['ADMIN_ORG'])
+                th_long = district.long
+                th_lat = district.lat
+            trails.append({'trail_id': trail['properties']['TRAIL_CN'], 
+                           'trail_no': trail['properties']['TRAIL_NO'], 
+                           'trail_name': trail['properties']['TRAIL_NAME'], 
+                           'region_id': trail['properties']['ADMIN_ORG'][:2], 
+                           'forest_id': trail['properties']['ADMIN_ORG'][:4], 
+                           'district_id': trail['properties']['ADMIN_ORG'],
+                           'is_trail_empty': False,
+                           'th_long': th_long,
+                           'th_lat': th_lat
+                           })
+
+    return trails
+    
+
+# def get_region_places(region_coord_file=region_coord_file):
+#     """get list of coordinate dictionaries for each region"""
+    
+#     soup = get_soup_from_file(region_coord_file)
+
+#     placemarks = soup.find_all('Placemark') 
+#     region_places = []       
+#     for placemark in placemarks[:]:
+#         id = placemark.select_one('[name="REGION"]').text
+#         hq = placemark.select_one('[name="REGIONHEADQUARTERS"]').text
+#         region_places.append({'id': id, 'place': hq})
+#     return region_places
+
+#---------------------------------------------------------------------#
+# GEOJSON FUNCTIONS
 
 
 # region_json = fs_data.get_geojson(fs_data.region_file)
@@ -204,23 +153,7 @@ def get_geojson(file):
 # district_json = fs_data.get_geojson(fs_data.district_file)
 # trail_json = fs_data.get_geojson(fs_data.trail_file)
 
-# get places for helper.get_lnglat_for_place(place) 
-
-def get_region_places(region_coord_file=region_coord_file):
-    """get list of coordinate dictionaries for each region"""
-    
-    soup = get_soup_from_file(region_coord_file)
-
-    placemarks = soup.find_all('Placemark') 
-    region_places = []       
-    for placemark in placemarks[:]:
-        id = placemark.select_one('[name="REGION"]').text
-        hq = placemark.select_one('[name="REGIONHEADQUARTERS"]').text
-        region_places.append({'id': id, 'place': hq})
-    return region_places
-
-
-def get_forests_geojson_for_region(file=forest_file, region_id='03'):
+def get_forests_geojson_for_region(file=forest_geojson, region_id='03'):
     geojson = get_geojson(file)
     newfeatures = []
     for feature in geojson['features']:
@@ -229,31 +162,31 @@ def get_forests_geojson_for_region(file=forest_file, region_id='03'):
     geojson['features'] = newfeatures
     return geojson
 
-def get_trailheads(file=trail_file):
-    trail_id_list = crud.get_trail_ids()
-    trail_id_set = set(trail_id_list)
-    with open(trail_file) as file:
-        trailset = geojson.load(file)
-        trails = []
-        for trail in trailset[:]:
-            if trail['properties']['TRAIL_CN'] in trail_id_set:
-                print(trail['properties']['TRAIL_CN'])
-                if trail['geometry']['coordinates']:
-                    long = trail['geometry']['coordinates'][0][0]
-                    lat = trail['geometry']['coordinates'][0][1]
-                else:
-                    district = crud.get_district_by_id(trail['properties']['ADMIN_ORG'])
-                    if district:
-                        long = district.long
-                        lat = district.lat
-                    else:
-                        forest = model.Forest.query.filter_by(forest_id = trail['properties']['ADMIN_ORG'][:4]).first()
-                        long = forest.long
-                        lat = forest.lat
-                trails.append({
-                    'id': trail['properties']['TRAIL_CN'],
-                    'th_long': long,
-                    'th_lat': lat
-                    })
+def get_districts_geojson_for_forest(file=district_geojson, forest_id='0301'):
+    geojson = get_geojson(file)
+    newfeatures = []
+    for feature in geojson['features']:
+        forest_num = feature['properties']['REGION'] + feature['properties']['FORESTNUMBER']
+        if  forest_num == forest_id:
+            newfeatures.append(feature)
+    geojson['features'] = newfeatures
+    return geojson
 
-    return trails
+
+def get_trails_geojson_for_district(file=trail_file, district_id='030102'):
+    geojson = get_geojson(file)
+    newfeatures = []
+    for feature in geojson['features']:
+        if feature['properties']['ADMIN_ORG'] == district_id:
+            newfeatures.append(feature)
+    geojson['features'] = newfeatures
+    return geojson
+
+def get_trail(file=trail_file, trail_id="11631010437"):
+    geojson = get_geojson(file)
+    newfeatures = []
+    for feature in geojson['features']:
+        if feature['properties']['TRAIL_CN'] == trail_id:
+            newfeatures.append(feature)
+    geojson['features'] = newfeatures
+    return geojson

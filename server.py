@@ -29,6 +29,9 @@ app.jinja_env.undefined = jinja2.StrictUndefined
 # TODO - remove before deployment
 app.config['PRESERVE_CONTEXT_ON_EXCEPTION'] = True
 
+# Make the openweather key a global variable
+openweatherkey = environ['OPENWEATHERAPIKEY']
+
 
 #---------------------------------------------------------------------#
 
@@ -80,35 +83,18 @@ def set_district():
 
     district_id = request.args.get('district')
     district_dict = helper.generate_district_dict(district_id)
-
+    print(f'{district_dict=}')
     return jsonify(district_dict)
 
 @app.route('/trail')
 def set_trail():
 
     trail_id = request.args.get('trail')
-    openweatherkey = environ['OPENWEATHERAPIKEY']
-    trail_dict = helper.generate_trail_dict(trail_id, openweatherkey)
-
+    distance = request.args.get('distance')
+    print(f'(((((((((((( {trail_id=}, {distance=}))))))))))))')
+    trail_dict = helper.generate_trail_dict(trail_id, openweatherkey, distance)
+    print(f'{trail_dict=}')
     return jsonify(trail_dict)
-
-@app.route("/search", methods=['POST'])
-def search():
-
-    # get list of TrailPoint objects corresponding to chosen trail
-    trail_id = request.form.get('trail-choice')
-    trail_name = crud.get_trail_name_with_trail_id(trail_id)
-    trailpoint_list = crud.get_trailpoint_list_with_trail_id(trail_id)
-
-    # get requested distance from trail in miles
-    miles = request.form.get('fire-distance')
-    miles = helper.to_int(miles)
-    # get list of Fire instances of nearby fires
-    nearby_fires = helper.get_nearby_fires(trailpoint_list, miles)
-    
-    # add fire information to session
-    session['fires'] = [[fire.fire_id, fire.fire_name, fire.longitude, fire.latitude] for fire in nearby_fires]
-    return render_template("map.html", fires=nearby_fires, trail_name=trail_name)
 
 @app.route('/initializeMap')
 def initialize_map():
@@ -117,7 +103,7 @@ def initialize_map():
 
 @app.route('/regions.geojson')
 def publish_geojson_regions():
-    region_json = fs_data.get_geojson(fs_data.region_file)
+    region_json = fs_data.get_geojson(fs_data.region_geojson)
     return region_json
 
 @app.route('/forests.geojson')
@@ -129,22 +115,32 @@ def publish_geojson_forests():
 
 @app.route('/districts.geojson')
 def publish_geojson_districts():
-    # TODO only get district info that corresponds to given forest 
-    district_json = fs_data.get_geojson(fs_data.district_file)
+    forest_id = request.args.get('forest')
+    district_json = fs_data.get_districts_geojson_for_forest(forest_id=forest_id)
+    print(f'*************{forest_id=}, {district_json.keys=}')
     return district_json
 
 @app.route('/trails.geojson')
 def publish_geojson_trails():
-    # TODO only get forest info that corresponds to given trails 
-    trail_json = fs_data.get_geojson(fs_data.trail_file)
-    return trail_json
+    district_id = request.args.get('district')
+    trails_json = fs_data.get_trails_geojson_for_district(district_id=district_id)
+    print(f'*************{district_id=}, {trails_json.keys=}')
+    return trails_json
 
 @app.route('/trail.geojson')
 def publish_single_geojson_trail():
-    ## TODO filter out geojson data to only return the trail I want
-    trail_json = fs_data.get_geojson(fs_data.trail_file)
+    trail_id = request.args.get('trail')
+    trail_json = fs_data.get_trail(trail_id=trail_id)
+    print(f'*************{trail_id=}, {trail_json.keys=}')
     return trail_json
 
+@app.route('/weather')
+def get_weather():
+    date = request.args.get('date')
+    trail_id = request.args.get('trail')
+    print(f'%%%%%%%%%%%%{date=}  {trail_id=}')
+    weather_dict = helper.get_weather_dict(date, trail_id, openweatherkey)
+    return jsonify(weather_dict)
 
 #---------------------------------------------------------------------#
 
