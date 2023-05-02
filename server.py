@@ -140,6 +140,7 @@ def get_weather():
     trail_id = request.args.get('trail')
     print(f'%%%%%%%%%%%%{date=}  {trail_id=}')
     weather_dict = helper.get_weather_dict(date, trail_id, openweatherkey)
+    print(f')))))) {weather_dict=}')
     return jsonify(weather_dict)
 
 #---------------------------------------------------------------------#
