@@ -147,15 +147,19 @@ def generate_region_dict(region_id):
 
 
 def generate_forest_dict(forest_id):
+    forest = crud.get_forest_by_forest(forest_id)
+    starting_lnglat = [forest.long, forest.lat]
     districts = [{'name': district.district_name, 'isEmpty': district.is_district_empty, 'id': district.district_id} for district in crud.get_districts_by_forest(forest_id)]
     trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_forest(forest_id)]
-    return {'districts': districts, 'trails': trails}
+    return {'districts': districts, 'trails': trails, 'startingLngLat': starting_lnglat}
 
 
 def generate_district_dict(district_id):
+    district = crud.get_district_by_id(district_id)
+    starting_lnglat = [district.long, district.lat]
     trails = [{'name': trail.trail_name, 'no': trail.trail_no, 'isEmpty': trail.is_trail_empty, 'id': trail.trail_id} for trail in crud.get_trails_by_district(district_id)]
 
-    return {'trails': trails}
+    return {'trails': trails, 'startingLngLat': starting_lnglat}
 
 def generate_trail_dict(trail_id, openweatherkey, distance='25'):
     int_distance = int(distance)
@@ -223,27 +227,33 @@ def get_weather_info(lnglat, openweatherkey, date = datetime.date.today()):
     weather_info = {}
     if 0 <= date_diff <= 8:
         response = requests.get(f'https://api.openweathermap.org/data/3.0/onecall?lat={lat}&lon={long}&exclude=current,minutely,hourly&units=imperial&appid={openweatherkey}')
-        current_weather = response.json()
-        weather = current_weather['daily'][date_diff]
-        weather_info['current'] = {'high': weather['temp']['max'], 'low': weather['temp']['min'], 'humidity': weather['humidity'], 'wind_speed': weather['wind_speed'], 'description': weather['weather'][0]['description']}
+        if response:
+            current_weather = response.json()
+            weather = current_weather['daily'][date_diff]
+            weather_info['current'] = {'high': weather['temp']['max'], 'low': weather['temp']['min'], 'humidity': weather['humidity'], 'wind_speed': weather['wind_speed'], 'description': weather['weather'][0]['description']}
     temp = 0 
     humidity = 0
     wind_speed = 0 
     description = []
     month = int(date.strftime('%m'))
     day = int(date.strftime('%d'))
+    counter = 0
     for yr in range(2018, 2023):
         print(yr)
         date_given_2022 = int(time.mktime(datetime.date(yr, month, day).timetuple()))
         historic_response = requests.get(f'https://api.openweathermap.org/data/3.0/onecall/timemachine?lat={lat}&lon={long}&dt={date_given_2022}&units=imperial&appid={openweatherkey}')
-        historic_weather = historic_response.json()
-        print(f'*****${historic_weather}')
-        historic = historic_weather['data'][0]
-        temp += historic['temp'] 
-        humidity += historic['humidity']
-        wind_speed += historic['wind_speed']
-        description.append(historic['weather'][0]['description'])
-    weather_info['historic'] = {'temp': temp/5, 'humidity': humidity/5, 'wind_speed': wind_speed/5, 'description': list(set(description))}
+        print(historic_response)
+        if historic_response:
+            counter +=1
+            print('yay historic response')
+            historic_weather = historic_response.json()
+            historic = historic_weather['data'][0]
+            temp += historic['temp'] 
+            humidity += historic['humidity']
+            wind_speed += historic['wind_speed']
+            description.append(historic['weather'][0]['description'])
+    if counter > 0:
+        weather_info['historic'] = {'temp': temp/counter, 'humidity': humidity/counter, 'wind_speed': wind_speed/counter, 'description': list(set(description))}
     return weather_info
 
 def get_today():
@@ -258,5 +268,7 @@ def get_weather_dict(date, trail_id, openweatherkey):
     dt_date = get_date_from_str(date)
     trail = crud.get_trail_with_trail_id(trail_id)
     lnglat = [trail.th_long, trail.th_lat]
+    print(dt_date, lnglat)
     weather = get_weather_info(lnglat, openweatherkey, dt_date)
+    print(weather)
     return weather
