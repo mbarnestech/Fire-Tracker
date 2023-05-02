@@ -296,8 +296,8 @@ document.querySelector('#forest-choice').addEventListener('input', (evt) => {
                 container: 'district-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
                 // TODO: change to center of forest
-                center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 4 // starting zoom
+                center: data['startingLngLat'], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
+                zoom: 8 // starting zoom
                 });
             
             // Load map
@@ -383,9 +383,8 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
             const map = new mapboxgl.Map({
                 container: 'trail-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
-                // TODO: change to center of forest
-                center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 4 // starting zoom
+                center: data['startingLngLat'], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
+                zoom: 10 // starting zoom
                 });
             
             // Load map
@@ -435,7 +434,7 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
                         }
                     });
 
-                    map.setFilter(`${trail.name}-label`, ['==', ['get', 'TRAIL_CN'], trail.id]);
+                    // map.setFilter(`${trail.name}-label`, ['==', ['get', 'TRAIL_CN'], trail.id]);
                     
                 }
 
@@ -495,7 +494,7 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
             style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
             center: trailhead, // starting position [lng, lat]
             // there is a map.fitBounds() feature but I haven't figured out yet how to use it to set original map
-            zoom: 9 // starting zoom
+            zoom: 10 // starting zoom
             });
             
             /* ---------- CREATE POINT FEATURES ---------- */
@@ -595,12 +594,16 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
 
             // create connected line of all trailpoint coordinates
             map.on('load', () => {
+                console.log("OH HI I'M LOADING")
                 // adding the coordinates for the line to use
                 map.addSource('route', {
                     'type': 'geojson',
-                    'data': '/trails.geojson'
+                    'data': `/trail.geojson${trail}`
                 });
                 // adding the line itself
+                console.log(trail_name)
+                const newColor = generateColor()
+                console.log(newColor)
                 map.addLayer({
                     'id': 'trail-route',
                     'type': 'line',
@@ -610,12 +613,10 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                         'line-cap': 'round'
                     },
                     'paint': {
-                        'line-color': '#000',
+                        'line-color': newColor,
                         'line-width': 10
                     },
-                    'filter': ['in', 'TRAIL_CN', `${trail}`]
                 });
-                // map.setFilter(`trail-route`, ['==', ['get', 'TRAIL_CN'], `${trail}`]);
                 console.log(map.getLayer('trail-route'))
                 });
 
@@ -631,12 +632,17 @@ document.querySelector('#trip-date').addEventListener('input', (evt) => {
     fetch(`/weather?date=${date}&trail=${trail}`)
         .then((response) => response.json())
         .then((data) => {
-            if ('current' in data){
+            console.log(data)
+            if ('current' in data) {
+                console.log(data.current)
                 document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
                 `<p> The weather is currently ${data.current.description}</p>`)
             } 
-            document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
-            `<p> Over the last five years, the weather on ${date} has been ${data.historic.description}</p`)
+            if ('historic' in data) {
+                console.log(data.historic)
+                document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
+                `<p> Over the last five years, the weather on ${date} has been ${data.historic.description}</p`)
+            }
 
         });
 });
