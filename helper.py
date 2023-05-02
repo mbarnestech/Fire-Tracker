@@ -194,19 +194,28 @@ def get_lnglat_for_place(place):
     place_string = place + ' coordinates'
     response = requests.get(f'https://www.google.com/search?q={place_string}')
     html_string = response.text
-    result = re.search(r"(?P<Nneg>-)?(?P<Ndegrees>\d+\.\d+).{1,2}? ?(?P<Ndir>N?S?),? (?P<Wneg>-)?(?P<Wdegrees>\d+\.\d+).{1,2}? ?(?P<Wdir>E?W?)", html_string)
+    result = re.search(r"(?P<Nneg>-)?(?P<Ndegrees>\d+\.\d+).{1,2}?°? ?(?P<Ndir>\(North\)|\(South\)|N|S?)?.? ?(?P<Wneg>-)?(?P<Wdegrees>\d+\.\d+).{1,2}?°? ?(?P<Wdir>E|W|\(East\)|\(West\)?)", html_string)
     if result:
-        print('yay')
-        print(f"{result.group('Nneg')=}, {result.group('Wneg')=}, {result.group('Ndegrees')=}, {result.group('Wdegrees')=}, {result.group('Ndir')=}, {result.group('Wdir')=}")
+        # print('yay')
+        # print(f"{result.group('Nneg')=}, {result.group('Wneg')=}, {result.group('Ndegrees')=}, {result.group('Wdegrees')=}, {result.group('Ndir')=}, {result.group('Wdir')=}")
         lat = get_latlong_float([result.group('Nneg'), result.group('Ndegrees'), result.group('Ndir')])
         lng = get_latlong_float([result.group('Wneg'), result.group('Wdegrees'), result.group('Wdir')])
         return [lng, lat]
-    result = re.search(r"(?P<Nneg>-)?(?P<Ndegrees>\d{2,3} ?)\°(?P<Nminutes>\d{1,2})\′(?P<Nseconds>\d*\.?\d*)?\″?N?S? (?P<Wneg>-)?(?P<Wdegrees>\d{2,3} ?)\°(?P<Wminutes>\d{1,2})\′(?P<Wseconds>\d*\.?\d*)?", html_string) 
+    result = re.search(r"(?P<Nneg>-)?(?P<Ndegrees>\d{2,3})\°(?P<Nminutes>\d{1,2})(′|(&#8242;))?(?P<Nseconds>\d+\.?\d*)?(″|(&#8243;))(?P<Ndir>\(North\)|\(South\)|N|S)? ?(?P<Wneg>-)?(?P<Wdegrees>\d{2,3})\°(?P<Wminutes>\d{1,2})(′|(&#8242;))(?P<Wseconds>\d+\.?\d*)?(″|(&#8243\;))(?P<Wdir>E|W|\(East\)|\(West\))?", html_string) 
     if result:
         print('also yay!')
+        print(f'{result.group()=}')
+        print(f"{result.group('Nneg')=}, {result.group('Wneg')=}, {result.group('Ndegrees')=}, {result.group('Wdegrees')=}, {result.group('Ndir')=}, {result.group('Wdir')=}")
+        neg = False
+        if result.group('Wdir') and result.group('Wneg') == None:
+            if result.group('Wdir') == 'W' or result.group('Wdir') == 'West':
+                neg = True
+        if result.group('Wneg'):
+            neg = True
         lat = create_decimal_latlong([result.group('Nneg'), result.group('Ndegrees'), result.group('Nminutes'), result.group('Nseconds') ])
-        lng = create_decimal_latlong([result.group('Wneg'), result.group('Wdegrees'), result.group('Wminutes'), result.group('Wseconds') ])
+        lng = create_decimal_latlong([neg, result.group('Wdegrees'), result.group('Wminutes'), result.group('Wseconds') ])
         return [lng, lat]
+        
     print('********** COULD NOT FIND COORDINATES **********')
 
 

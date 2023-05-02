@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         }
                     });
                     
-                    map.setFilter(`${region.name}-label`, ['==', ['get', 'REGION'], region.id]);
+                    // map.setFilter(`${region.name}-label`, ['==', ['get', 'REGION'], region.id]);
                     
                 }
                 
@@ -199,7 +199,7 @@ document.querySelector('#region-choice').addEventListener('input', (evt) => {
                 map.addSource(
                     'forests', {
                         'type': 'geojson',
-                        'data': '/forests.geojson'
+                        'data': `/forests.geojson${region}`
                     });
 
                 // add fill color to forests
@@ -216,7 +216,7 @@ document.querySelector('#region-choice').addEventListener('input', (evt) => {
                             'fill-opacity': 0.5,
                             'fill-outline-color': newColor
                         },
-                        'filter': ["==", forest.id, ["get", "FORESTORGCODE"]]
+                        'filter': ["==", forest.name, ["get", "FORESTNAME"]]
                     })
                     
                     map.addLayer({
@@ -237,7 +237,6 @@ document.querySelector('#region-choice').addEventListener('input', (evt) => {
                         }
                     });
 
-                    map.setFilter(`${forest.name}-label`, ['==', ['get', 'FORESTORGCODE'], forest.id]);
                     
                 }
 

@@ -8,6 +8,7 @@ import re
 
 # import local modules
 import crud
+import model
 
 #---------------------------------------------------------------------#
 
@@ -90,11 +91,15 @@ def get_trails_only(trail_file):
     with open(trail_file) as file:
         trailset = geojson.load(file)
         trails = []
+        districts = get_district_ids()
+        district_set = set(districts)
         for trail in trailset[:]:
             if (trail['properties']['ADMIN_ORG'] and 
                 trail['properties']['TRAIL_NAME'] and
                 trail['properties']['TRAIL_CN'] not in [trail['trail_id'] for trail in trails] and
-                len(trail['properties']['ADMIN_ORG']) == 6
+                len(trail['properties']['ADMIN_ORG']) == 6 and
+                trail['properties']['ADMIN_ORG'] in district_set and
+                trail['geometry']['coordinates']
                 ):
                 trails.append({'trail_id': trail['properties']['TRAIL_CN'], 
                                'trail_no': trail['properties']['TRAIL_NO'], 
@@ -103,11 +108,6 @@ def get_trails_only(trail_file):
                                'forest_id': trail['properties']['ADMIN_ORG'][:4], 
                                'district_id': trail['properties']['ADMIN_ORG'],
                                'is_trail_empty': False})
-                for coordinate in trail['geometry']['coordinates']:
-                    if not (type(coordinate[0]) == float and type(coordinate[1]) == float):
-                        removed = trails.pop()
-                        print(f'***** REMOVED ****** {removed}{coordinate[0]=}{coordinate[1]=}')
-                        break
 
     return trails
     
@@ -220,11 +220,40 @@ def get_region_places(region_coord_file=region_coord_file):
     return region_places
 
 
-def filter_admin_boundaries(file=forest_file, region_id='03'):
+def get_forests_geojson_for_region(file=forest_file, region_id='03'):
     geojson = get_geojson(file)
     newfeatures = []
     for feature in geojson['features']:
         if feature['properties']['REGION'] == region_id:
-            features.append(feature)
+            newfeatures.append(feature)
     geojson['features'] = newfeatures
     return geojson
+
+def get_trailheads(file=trail_file):
+    trail_id_list = crud.get_trail_ids()
+    trail_id_set = set(trail_id_list)
+    with open(trail_file) as file:
+        trailset = geojson.load(file)
+        trails = []
+        for trail in trailset[:]:
+            if trail['properties']['TRAIL_CN'] in trail_id_set:
+                print(trail['properties']['TRAIL_CN'])
+                if trail['geometry']['coordinates']:
+                    long = trail['geometry']['coordinates'][0][0]
+                    lat = trail['geometry']['coordinates'][0][1]
+                else:
+                    district = crud.get_district_by_id(trail['properties']['ADMIN_ORG'])
+                    if district:
+                        long = district.long
+                        lat = district.lat
+                    else:
+                        forest = model.Forest.query.filter_by(forest_id = trail['properties']['ADMIN_ORG'][:4]).first()
+                        long = forest.long
+                        lat = forest.lat
+                trails.append({
+                    'id': trail['properties']['TRAIL_CN'],
+                    'th_long': long,
+                    'th_lat': lat
+                    })
+
+    return trails

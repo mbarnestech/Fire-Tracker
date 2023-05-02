@@ -99,6 +99,9 @@ def get_trails_by_forest(forest_id):
 
 # Get tables by District
 
+def get_district_by_id(district_id):
+    return District.query.filter_by(district_id = district_id).first()
+
 def get_trails_by_district(district_id):
     return Trail.query.filter_by(district_id = district_id).all()
 
@@ -160,7 +163,7 @@ def get_last_db_update():
 # UPDATE
 
 def update_fires():
-    from datetime import date
+    
 
     fires = fire_data.get_fires()
     
@@ -232,6 +235,39 @@ def add_latlong_to_regions():
     db.session.commit()
     print(f'******* REGIONS TABLE UPDATED *******')
 
+def add_latlong_to_forests():
+    forests = get_forests()
+    for forest in forests:
+        long, lat = helper.get_lnglat_for_place(forest.forest_name)
+        db.session.query(Forest).filter(Forest.forest_id == forest.forest_id).update(
+                {'lat': lat, 'long': long}, synchronize_session="fetch")
+    db.session.commit()
+    print(f'******* FORESTS TABLE UPDATED *******')
+
+def add_latlong_to_districts():
+    districts = get_districts()
+    for district in districts:
+        print(district.district_name)
+        lnglat = helper.get_lnglat_for_place(district.district_name)
+        if lnglat:
+            long, lat = lnglat
+        else:
+            forest = Forest.query.filter_by(forest_id = district.forest_id).first()
+            long = forest.long
+            lat = forest.lat
+        db.session.query(District).filter(District.district_id == district.district_id).update(
+                    {'lat': lat, 'long': long}, synchronize_session="fetch")
+    db.session.commit()
+    print(f'******* DISTRICTS TABLE UPDATED *******')
+
+
+def add_latlong_to_trails():
+    th_data = fs_data.get_trailheads()
+    for trail in th_data:
+        db.session.query(Trail).filter(Trail.trail_id == trail.id).update(
+                {'lat': trail.th_lat, 'long': trail.th_long}, synchronize_session="fetch")
+    db.session.commit()
+    print(f'******* FORESTS TABLE UPDATED *******')
 #---------------------------------------------------------------------#
 
 # Connect to database when running crud.py interactively

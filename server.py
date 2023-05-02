@@ -122,8 +122,9 @@ def publish_geojson_regions():
 
 @app.route('/forests.geojson')
 def publish_geojson_forests():
-    # TODO only get forest info that corresponds to given region
-    forest_json = fs_data.get_geojson(fs_data.forest_file)
+    region_id = request.args.get('region')
+    forest_json = fs_data.get_forests_geojson_for_region(region_id=region_id)
+    print(f'*************{region_id=}, {forest_json.keys=}')
     return forest_json
 
 @app.route('/districts.geojson')
