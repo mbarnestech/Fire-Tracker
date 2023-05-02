@@ -71,6 +71,9 @@ def get_trails_by_region(region_id):
 
 # Get tables by Forest
 
+def get_forest_by_forest(forest_id):
+    return Forest.query.filter_by(forest_id = forest_id).first()
+
 def get_districts_by_forest(forest_id):
     return District.query.filter_by(forest_id = forest_id).all()
 
