@@ -47,7 +47,7 @@ def index():
     today = helper.get_today()
     next_year = helper.get_next_year()
 
-    return render_template("index2.html", today = today, next_year = next_year)
+    return render_template("index4.html", today = today, next_year = next_year)
 
 
 @app.route("/initialize")

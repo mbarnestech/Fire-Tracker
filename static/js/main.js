@@ -14,42 +14,14 @@ function generateColor() {
     return `${color}`
 }
 
-// Carousel Controls
-
-document.ready(function(){
-    // Activate Carousel
-    document.querySelector('#carousel').carousel();
-      
-    // Enable Carousel Indicators
-    document.querySelector.click(function(){
-      $("#myCarousel").carousel(0);
-    });
-    $(".item2").click(function(){
-      $("#myCarousel").carousel(1);
-    });
-    $(".item3").click(function(){
-      $("#myCarousel").carousel(2);
-    });
-    $(".item4").click(function(){
-      $("#myCarousel").carousel(3);
-    });
-      
-    // Enable Carousel Controls
-    $(".left").click(function(){
-      $("#myCarousel").carousel("prev");
-    });
-    $(".right").click(function(){
-      $("#myCarousel").carousel("next");
-    });
-  });
 document.addEventListener("DOMContentLoaded", () => {
     fetch("/initialize")
         .then((response) => response.json())
         .then((data) => {
-            const trails = data['trails'];
+            // const trails = data['trails'];
             const regions = data['regions'];
-            const forests = data['forests'];
-            const districts = data['districts'];
+            // const forests = data['forests'];
+            // const districts = data['districts'];
             mapboxgl.accessToken = `${data.mapKey}`;
 
             // Populate region choices
@@ -58,41 +30,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 `<option value = '${region['id']}'>${region['name']}</option>`)
             }
 
-            // Populate forest choices
-            for (const forest of forests) {
-                const name = forest['name']
-                const id = forest['id']
-                const isEmpty = forest['isEmpty']
-                if (isEmpty === true){
-                document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}' disabled>${name}</option>`)} else {
-                document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}'>${name}</option>`)}
-            }
+            // Reset Dropdowns
+            document.querySelector('#forest-choice').innerHTML = ''
+            document.querySelector('#district-choice').innerHTML = ''
+            document.querySelector('#trail-choice').innerHTML = ''
 
-            // Populate district choices
-            for (const district of districts) {
-                const name = district['name']
-                const id = district['id']
-                const isEmpty = district['isEmpty']
-                if (isEmpty === true){
-                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}' disabled>${name}</option>`)} else {
-                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}'>${name}</option>`)}
-            }
-            // Populate trail choices
-            for (const trail of trails) {
-                const name = `${trail['no']}: ${trail['name']}`
-                const id = trail['id']
-                const isEmpty = trail['isEmpty']
-                if (isEmpty === true){
-                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '' disabled>${name}</option>`)} else {
-                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}'>${name}</option>`)}
-            }
-
+            // make sure trail info is hidden
+            document.getElementById('trail-info').style.visibility = "hidden";
 
             // Create map
             const map = new mapboxgl.Map({
@@ -102,6 +46,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 zoom: 4 // starting zoom
                 });
             
+            // resize map on render
+            map.on('render', () => {
+                map.resize();});
+
             // Load map
             map.on('load', () => {
                 map.addSource(
@@ -149,27 +97,40 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 
                 
-                // Add zoom and rotation controls to the map.
+                // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                
+                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with region map')
             });
         })
   });
 
 
-//   both 'input' and 'change' events seem to listen equally well for selection
+// //   both 'input' and 'change' events seem to listen equally well for selection
 document.querySelector('#region-choice').addEventListener('input', (evt) => {
     const region = `?region=${evt.target.value}`
     fetch(`/region${region}`)
         .then((response) => response.json())
         .then((data) => {
-            const trails = data['trails'];
+            // const trails = data['trails'];
             const forests = data['forests'];
-            const districts = data['districts'];
+            // const districts = data['districts'];
+
+            // Reset Maps
+            document.querySelector("#forest-map").innerHTML = ''
+            document.querySelector("#district-map").innerHTML = ''
+            document.querySelector("#trail-map").innerHTML = ''
+            document.querySelector("#trail-and-fire-map").innerHTML = ''
+
+            // Reset Dropdowns
+            document.querySelector('#forest-choice').innerHTML = ''
+            document.querySelector('#district-choice').innerHTML = ''
+            document.querySelector('#trail-choice').innerHTML = ''
+
+            // make sure trail info is hidden
+            document.getElementById('trail-info').style.visibility = "hidden";
 
             // Update Forests
-            document.querySelector('#forest-choice').innerHTML = ''
             document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
                 '<option value="" disabled selected>Choose a National Forest</option>')
             for (const forest of forests) {
@@ -182,45 +143,18 @@ document.querySelector('#region-choice').addEventListener('input', (evt) => {
                 document.querySelector('#forest-choice').insertAdjacentHTML("beforeend", 
                 `<option value = '${id}'>${name}</option>`)}
             }
-            
-            // Update Districts
-            document.querySelector('#district-choice').innerHTML = ''
-            document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-                '<option value="" disabled selected>Choose a Ranger District</option>')
-            for (const district of districts) {
-                const name = district['name']
-                const id = district['id']
-                const isEmpty = district['isEmpty']
-                if (isEmpty === true){
-                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}' disabled>${name}</option>`)} else {
-                document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}'>${name}</option>`)}
-            }
-
-            // Update trails
-            document.querySelector('#trail-choice').innerHTML = ''
-            document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                '<option value="" disabled selected>Choose a Trail</option>')
-            for (const trail of trails) {
-                const name = `${trail['no']}: ${trail['name']}`
-                const id = trail['id']
-                const isEmpty = trail['isEmpty']
-                if (isEmpty === true){
-                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '' disabled>${name}</option>`)} else {
-                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}'>${name}</option>`)}
-            }
 
             // Create map
             const map = new mapboxgl.Map({
                 container: 'forest-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
-                // TODO: change to center of region
                 center: data['startingLngLat'], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 6 // starting zoom
+                zoom: 5 // starting zoom
                 });
+            
+            // resize map on render
+            map.on('render', () => {
+                map.resize();});
             
             // Load map
             map.on('load', () => {
@@ -268,9 +202,9 @@ document.querySelector('#region-choice').addEventListener('input', (evt) => {
                     
                 }
 
-                // Add navigation controls
+                // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                
+                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with forest map')
                 
             });
@@ -285,11 +219,22 @@ document.querySelector('#forest-choice').addEventListener('input', (evt) => {
     fetch(`/forest${forest}`)
         .then((response) => response.json())
         .then((data) => {
-            const trails = data['trails'];
+            // const trails = data['trails'];
             const districts = data['districts'];
 
-            // Update Districts
+            // Reset Maps
+            document.querySelector("#district-map").innerHTML = ''
+            document.querySelector("#trail-map").innerHTML = ''
+            document.querySelector("#trail-and-fire-map").innerHTML = ''
+
+            // Reset Dropdowns
             document.querySelector('#district-choice').innerHTML = ''
+            document.querySelector('#trail-choice').innerHTML = ''
+
+            // make sure trail info is hidden
+            document.getElementById('trail-info').style.visibility = "hidden";
+
+            // Update Districts
             document.querySelector('#district-choice').insertAdjacentHTML("beforeend", 
                 '<option value="" disabled selected>Choose a Ranger District</option>')
             for (const district of districts) {
@@ -303,31 +248,18 @@ document.querySelector('#forest-choice').addEventListener('input', (evt) => {
                 `<option value = '${id}'>${name}</option>`)}
             }
 
-            // Update trails
-            document.querySelector('#trail-choice').innerHTML = ''
-            document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                '<option value="" disabled selected>Choose a Trail</option>')
-            for (const trail of trails) {
-                const name = `${trail['no']}: ${trail['name']}`
-                const id = trail['id']
-                const isEmpty = trail['isEmpty']
-                if (isEmpty === true){
-                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '' disabled>${name}</option>`)} else {
-                document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
-                `<option value = '${id}'>${name}</option>`)}
-
-            }
-
             // Create map
             const map = new mapboxgl.Map({
                 container: 'district-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
-                // TODO: change to center of forest
                 center: data['startingLngLat'], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
                 zoom: 8 // starting zoom
                 });
             
+            // resize map on render
+            map.on('render', () => {
+                map.resize();});
+
             // Load map
             map.on('load', () => {
                 map.addSource(
@@ -375,9 +307,9 @@ document.querySelector('#forest-choice').addEventListener('input', (evt) => {
                     
                 }
 
-                // Add navigation controls
+                // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                
+                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with district map')
                 
             });
@@ -392,8 +324,17 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
         .then((data) => {
             const trails = data['trails'];
 
-            // Update trails
+            // Reset Maps
+            document.querySelector("#trail-map").innerHTML = ''
+            document.querySelector("#trail-and-fire-map").innerHTML = ''
+
+            // Reset Dropdowns
             document.querySelector('#trail-choice').innerHTML = ''
+
+            // make sure trail info is hidden
+            document.getElementById('trail-info').style.visibility = "hidden";
+
+            // Update trails
             document.querySelector('#trail-choice').insertAdjacentHTML("beforeend", 
                 '<option value="" disabled selected>Choose a Trail</option>')
             for (const trail of trails) {
@@ -415,6 +356,10 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
                 zoom: 10 // starting zoom
                 });
             
+            // resize map on render
+            map.on('render', () => {
+                map.resize();});
+
             // Load map
             map.on('load', () => {
                 map.addSource(
@@ -466,9 +411,9 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
                     
                 }
 
-                // Add navigation controls
+                // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                
+                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with trail map')
                 
             });
@@ -476,9 +421,8 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
         })
 });
 
-
-document.querySelector('#trail-choice').addEventListener('input', (evt) => {
-    const trail = `?trail=${evt.target.value}`
+document.querySelector('#trail-choice').addEventListener('input', () => {
+    const trail = `?trail=${document.getElementById('trail-choice').value}`
     const distance = `${document.getElementById('fire-distance').value}`
     fetch(`/trail${trail}&distance=${distance}`)
         .then((response) => response.json())
@@ -488,42 +432,72 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
             const trailhead = data.trailhead
             const aqi = data.aqi
 
-            // reset fire information
-            document.querySelector('#trail-and-fire-info').innerHTML = ""
+            // Reset Map
+            document.querySelector("#trail-and-fire-map").innerHTML = ''
 
+            // reset fire & weather information
+            document.querySelector('#fire-info').innerHTML = ""
+            document.querySelector('#aqi-info').innerHTML = ""
+            document.querySelector('#weather-today').innerHTML = ""
+            document.querySelector('#forecast-info').innerHTML = ""
+            document.querySelector('#historic-weather-info').innerHTML = ""
+
+            // make sure trail info is visible
+            document.getElementById('trail-info').style.visibility = "visible";
+            
             // provide fire info outside of map
             if (fires.length === 0){
-                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
-                    `<h3> There are currently no fires within 25 miles of ${trail_name}. </h3>`)
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `<h4> There are currently no fires within 25 miles of ${trail_name}. </h4>`)
             } else if (fires.length === 1){
-                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
-                    `<h3> There is currently one fire within 25 miles of ${trail_name}: </h3>
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `<h4> There is currently one fire within 25 miles of ${trail_name}: </h4>
                     <h4><a href=${fires[0].url}>${fires[0].name}</a></h4>
                     `)
             } else {
-                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
-                    `<h3> There are currently ${fires.length} fires within 25 miles of ${trail_name}:</h3>
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `<h4> There are currently ${fires.length} fires within 25 miles of ${trail_name}:</h4>
                     <ul>`)
-                for (const fire in fires){
-                    document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
+                for (const fire of fires){
+                    document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
                     `<li><h4><a href=${fire.url}>${fire.name}</a></h4></li>`)
                 }
-                document.querySelector('#trail-and-fire-info').insertAdjacentHTML("beforeend", 
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
                     `</ul`)
             }
 
             // add AQI data
-            document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
+            document.querySelector('#aqi-info').insertAdjacentHTML("beforeend", 
                     `<p> The AQI at ${trail_name} is currently ${aqi} on a scale of 1 (good) to 5 (very poor).</p>`)
+
+
+            // add today's weather
+            const today = document.getElementById('trip-date').value
+            fetch(`/weather${trail}&date=${today}`)
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data)
+                    if ('current' in data) {
+                        console.log(data.current)
+                        document.querySelector('#weather-today').insertAdjacentHTML("beforeend", 
+                        `<p> The weather will be ${data.current.description} today.</p>`)
+                    } 
+            });
+
+            /* ---------- CREATE MAP ---------- */
 
             // create new map centering on beginning of trail
             const map = new mapboxgl.Map({
-            container: 'trail-and-fire-map', // container ID
-            style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
-            center: trailhead, // starting position [lng, lat]
-            // there is a map.fitBounds() feature but I haven't figured out yet how to use it to set original map
-            zoom: 10 // starting zoom
+                container: 'trail-and-fire-map', // container ID
+                style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
+                center: trailhead, // starting position [lng, lat]
+                // there is a map.fitBounds() feature but I haven't figured out yet how to use it to set original map
+                zoom: 10 // starting zoom
             });
+
+            // resize map on render
+            map.on('render', () => {
+                map.resize();});
             
             /* ---------- CREATE POINT FEATURES ---------- */
 
@@ -566,6 +540,7 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                 }
             )
             
+
             // include the above list of features when loading map
             map.on('load', () => {
                 map.addSource('places', {
@@ -616,6 +591,10 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
                 map.on('mouseleave', 'places', () => {
                     map.getCanvas().style.cursor = '';
                     });
+
+                // Add zoom, rotation, and full-screen controls to the map.
+                map.addControl(new mapboxgl.NavigationControl());
+                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
             });
 
             /* ---------- CREATE TRAIL FEATURE ---------- */
@@ -653,6 +632,8 @@ document.querySelector('#trail-choice').addEventListener('input', (evt) => {
 });
 
 
+
+
 document.querySelector('#trip-date').addEventListener('input', (evt) => {
     const date = `${evt.target.value}`
     const trail = `${document.getElementById('trail-choice').value}`
@@ -663,14 +644,202 @@ document.querySelector('#trip-date').addEventListener('input', (evt) => {
             console.log(data)
             if ('current' in data) {
                 console.log(data.current)
-                document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
-                `<p> The weather is currently ${data.current.description}</p>`)
+                document.querySelector('#forecast-info').insertAdjacentHTML("beforeend", 
+                `<p> The weather will be ${data.current.description} on ${date}.</p>`)
             } 
             if ('historic' in data) {
                 console.log(data.historic)
-                document.querySelector('#trail-info').insertAdjacentHTML("beforeend", 
-                `<p> Over the last five years, the weather on ${date} has been ${data.historic.description}</p`)
+                document.querySelector('#historic-weather-info').insertAdjacentHTML("beforeend", 
+                `<p> Over the last five years, the weather on ${date.slice(5,)} has been ${data.historic.description}</p`)
             }
 
+        });
+});
+
+document.querySelector('#fire-distance').addEventListener('change', () => {
+    const trail = `?trail=${document.getElementById('trail-choice').value}`
+    const distance = `${document.getElementById('fire-distance').value}`
+    fetch(`/trail${trail}&distance=${distance}`)
+        .then((response) => response.json())
+        .then((data) => {
+            const fires = data.fires
+            const trail_name = data.trail_name
+            const trailhead = data.trailhead
+            const aqi = data.aqi
+
+            // Reset Map
+            document.querySelector("#trail-and-fire-map").innerHTML = ''
+
+            // reset fire information
+            document.querySelector('#fire-info').innerHTML = ""
+
+            // make sure trail info is visible
+            document.getElementById('trail-info').style.visibility = "visible";
+            
+            // provide fire info outside of map
+            if (fires.length === 0){
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `<h4> There are currently no fires within ${distance} miles of ${trail_name}. </h4>`)
+            } else if (fires.length === 1){
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `<h4> There is currently one fire within 25 miles of ${trail_name}: </h4>
+                    <h4><a href=${fires[0].url}>${fires[0].name}</a></h4>
+                    `)
+            } else {
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `<h4> There are currently ${fires.length} fires within 25 miles of ${trail_name}:</h4>
+                    <ul>`)
+                for (const fire of fires){
+                    document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `<li><h4><a href=${fire.url}>${fire.name}</a></h4></li>`)
+                }
+                document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
+                    `</ul`)
+            }
+
+            /* ---------- CREATE MAP ---------- */
+
+            // create new map centering on beginning of trail
+            const map = new mapboxgl.Map({
+                container: 'trail-and-fire-map', // container ID
+                style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
+                center: trailhead, // starting position [lng, lat]
+                // there is a map.fitBounds() feature but I haven't figured out yet how to use it to set original map
+                zoom: 10 // starting zoom
+            });
+
+            // resize map on render
+            map.on('render', () => {
+                map.resize();});
+            
+            /* ---------- CREATE POINT FEATURES ---------- */
+
+            // Create list of features
+            const geoJsonFeatures = []
+            // Add fire features only if fires were found in range
+            if (data.fires.length > 0){
+                // loop through those fires
+                for (const fire of data.fires){
+                    // create one feature for each fire, changing description and coordinate with each
+                    geoJsonFeatures.push(
+                        {
+                            'type': 'Feature',
+                            'properties': {
+                            'description': `<p>${fire.name}</p>`,
+                            // 'iconSize': [30, 30],
+                            'icon': 'fire-station' // maki icon stylized for this map
+                            },
+                            'geometry': {
+                            'type': 'Point',
+                            'coordinates': [`${fire.longitude}`, `${fire.latitude}`]
+                            }
+                        }
+                    )
+                }
+            };
+            // create a Trailhead feature at first long/lat trail point
+            geoJsonFeatures.push(
+                {
+                    'type': 'Feature',
+                    'properties': {
+                    'description': `<p>Trailhead of ${trail_name}</p>`,
+                    // 'iconSize': [30, 30],
+                    'icon': 'parking' // maki icon stylized for this map
+                    },
+                    'geometry': {
+                    'type': 'Point',
+                    'coordinates': trailhead
+                    }
+                }
+            )
+            
+
+            // include the above list of features when loading map
+            map.on('load', () => {
+                map.addSource('places', {
+                    'type': 'geojson',
+                    'data': {
+                        'type': 'FeatureCollection',
+                        'features': geoJsonFeatures
+                    }
+                });
+
+                // Add a layer showing the places.
+                map.addLayer({
+                    'id': 'places',
+                    'type': 'symbol',
+                    'source': 'places',
+                    'layout': {
+                    'icon-image': ['get', 'icon'],
+                    'icon-allow-overlap': true
+                    }
+                });
+
+                // When a click event occurs on a feature in the places layer, open a popup at the
+                // location of the feature, with description HTML from its properties.
+                map.on('click', 'places', (e) => {
+                    // Copy coordinates array.
+                    const coordinates = e.features[0].geometry.coordinates.slice();
+                    const description = e.features[0].properties.description;
+                    
+                    // Ensure that if the map is zoomed out such that multiple
+                    // copies of the feature are visible, the popup appears
+                    // over the copy being pointed to.
+                    while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                    coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                    }
+                    
+                    new mapboxgl.Popup()
+                    .setLngLat(coordinates)
+                    .setHTML(description)
+                    .addTo(map);
+                    });
+                    
+                // Change the cursor to a pointer when the mouse is over the places layer.
+                map.on('mouseenter', 'places', () => {
+                    map.getCanvas().style.cursor = 'pointer';
+                    });
+                
+                // Change it back to a pointer when it leaves.
+                map.on('mouseleave', 'places', () => {
+                    map.getCanvas().style.cursor = '';
+                    });
+
+                // Add zoom, rotation, and full-screen controls to the map.
+                map.addControl(new mapboxgl.NavigationControl());
+                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+            });
+
+            /* ---------- CREATE TRAIL FEATURE ---------- */
+
+            // create connected line of all trailpoint coordinates
+            map.on('load', () => {
+                console.log("OH HI I'M LOADING")
+                // adding the coordinates for the line to use
+                map.addSource('route', {
+                    'type': 'geojson',
+                    'data': `/trail.geojson${trail}`
+                });
+                // adding the line itself
+                console.log(trail_name)
+                const newColor = generateColor()
+                console.log(newColor)
+                map.addLayer({
+                    'id': 'trail-route',
+                    'type': 'line',
+                    'source': 'route',
+                    'layout': {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    'paint': {
+                        'line-color': newColor,
+                        'line-width': 10
+                    },
+                });
+                console.log(map.getLayer('trail-route'))
+                });
+
+      
         });
 });

@@ -1,53 +1,36 @@
-/* .flex {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
+* {
+    text-align: center;
 }
 
 
-
-main {
-    flex-direction: column;
+.carousel-item {
+    width: 80%;
+    height: 650px;
 }
 
-.main-middle, .main-top {
-    flex-direction: row;
+.hidden {
+    display: block !important;
+    visibility: hidden;
+    padding-bottom: 10px;
 }
 
-.container {
-    border: 2px solid black;
+select {
+    display: inline;
+    align-items: center;
+}
+.map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+} 
+.map-container {
+    width: 100%;
+    height: 550px;
+    border: 5px solid darkgoldenrod;
 }
 
-.left {
-    flex: 1 0 40%;
-}
-
-.right {
-    flex: 1 0 60%;
-}
-
-*/ .map {
-    min-width: 500px; 
-    min-height: 500px;
-} /*
-
-.lower {
-    flex: 1 0 100%;
-}
-
-.map.forest {
-    display: none;
-}
-
-.map.district {
-    display: none;
-}
-
-.map.trails {
-    display: none;
-}
-
-.map.trail {
-    display: none;
-} */
+#trail-info {
+    visibility: hidden;
+  }

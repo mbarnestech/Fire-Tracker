@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container">
+
+    <div class="row">
+        <div class="col"> 
+            <header>
+                <h1> Welcome to my project. </h1> 
+            </header>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-5">
+            <section id="form-container">
+                <form>
+                    <fieldset class="region">
+                        <legend>US Forest Service Regions</legend>
+                        <label for="region-choice">Please choose a Region:</label>
+                        <select name="region-choice" id="region-choice">
+                            <option value="" disabled selected>Regions</option>
+                        </select>
+                    </fieldset>
+                    <fieldset class="forest">
+                        <legend>National Forests</legend>
+                        <label for="forest-choice">Please choose a Forest:</label>
+                        <select name="forest-choice" id="forest-choice">
+                            <option value="" disabled selected>National Forests</option>
+                        </select>
+                    </fieldset>
+                    <fieldset class="district">
+                        <legend>Ranger Districts</legend>
+                        <label for="district-choice">Please choose a District:</label>
+                        <select name="district-choice" id="district-choice">
+                            <option value="" disabled selected>Ranger Districts</option>
+                        </select>
+                    </fieldset>
+                    <fieldset class="trails">
+                        <legend>Trails</legend>
+                        <label for="trail-choice">Please choose a Trail:</label>
+                        <select name="trail-choice" id="trail-choice">
+                            <option value="" disabled selected>Trails</option>
+                        </select>
+                    </fieldset>
+                    <fieldset class="trail">
+                        <legend>Trip Date</legend>
+                        <label for="trip-date">What day are you planning on visiting the trail?</label>
+                        <input type="date" id="trip-date" name="trip-start" value={{ today }} min={{ today }} max={{next_year}} required pattern="\d{4}-\d{2}-\d{2}">
+                    </fieldset>
+                    <fieldset class="trail">
+                        <legend>Fire Range</legend>
+                        <label for="fire-distance"> How many miles from the trailhead do you want to check for fires?</label>
+                        <input type="text" name="fire-distance" id="fire-distance" value="25">
+                    </fieldset>
+
+                </form>
+            </section>
+        </div>
+        <div class="col-7">
+            <section id="map-container">
+
+                <ul class="nav nav-tabs justify-content-end">
+                    <li class="nav-item region selected">
+                        <a href="#region-map">Region</a>
+                    </li>
+                    <li class="nav-item forest">
+                        <a href="#forest-map">Forest</a>
+                    </li>
+                    <li class="nav-item district">
+                        <a href="#district-map">District</a>
+                    </li>
+                    <li class="nav-item trails">
+                        <a href="#trail-map">Trails</a>
+                    </li>
+                    <li class="nav-item trail">
+                        <a href="#trail-and-fire-map">Result</a>
+                    </li>
+                </ul>
+
+                <div class="region">
+                    <h2>Region Map</h2>
+                    <div id="region-map" class="map"></div>
+                </div>
+                <div class="map forest">
+                    <h2>Forest Map</h2>
+                    <div id="forest-map" class="map"></div>
+                </div>
+                <div class="map district">
+                    <h2>District Map</h2>
+                    <div id="district-map" class="map"></div>
+                </div>
+                <div class="map trails">
+                    <h2>Trails Map</h2>
+                    <div id="trail-map" class="map"></div>
+                </div>
+                <div class="map trail">
+                    <h2>Selected Trail & Fire Map</h2>
+                    <div id="trail-and-fire-map" class="map"></div>
+                </div>
+            </section>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col">
+            <section id="trail-info">
+                <h3>HI!</h3>
+                <div id="fire-info"></div>
+                <div id="aqi-info"></div>
+                <div id="current-weather-info"></div>
+                <div id="historic-weather-info"></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <footer>
+                <h4>Fire Tracker is a Hackbright Academy Project by Maggie Barnes.</h4>
+            </footer>
+        </div>
+    </div>
+</section>
+</main>
+{% endblock %}
