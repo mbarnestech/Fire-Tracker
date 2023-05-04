@@ -14,7 +14,34 @@ function generateColor() {
     return `${color}`
 }
 
+// Carousel Controls
 
+document.ready(function(){
+    // Activate Carousel
+    document.querySelector('#carousel').carousel();
+      
+    // Enable Carousel Indicators
+    document.querySelector.click(function(){
+      $("#myCarousel").carousel(0);
+    });
+    $(".item2").click(function(){
+      $("#myCarousel").carousel(1);
+    });
+    $(".item3").click(function(){
+      $("#myCarousel").carousel(2);
+    });
+    $(".item4").click(function(){
+      $("#myCarousel").carousel(3);
+    });
+      
+    // Enable Carousel Controls
+    $(".left").click(function(){
+      $("#myCarousel").carousel("prev");
+    });
+    $(".right").click(function(){
+      $("#myCarousel").carousel("next");
+    });
+  });
 document.addEventListener("DOMContentLoaded", () => {
     fetch("/initialize")
         .then((response) => response.json())
