@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="container">
+
+    <div class="row">
+        <div class="col "> 
+            <header>
+                <h1> Welcome to my project. </h1> 
+            </header>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <div id="carousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="false">
+                <div class="carousel-indicators">
+                    <button type="button" data-bs-target="#carousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="region"></button>
+                    <button type="button" data-bs-target="#carousel" data-bs-slide-to="1" aria-label="forest"></button>
+                    <button type="button" data-bs-target="#carousel" data-bs-slide-to="2" aria-label="district"></button>
+                    <button type="button" data-bs-target="#carousel" data-bs-slide-to="3" aria-label="trails"></button>
+                    <button type="button" data-bs-target="#carousel" data-bs-slide-to="4" aria-label="final"></button>
+                </div>
+                <div class="carousel-inner">
+                    <!-- Region Carousel -->
+                    <div class="carousel-item region active">
+                        <div class="region"></div>
+                            <label for="region-choice">Please choose a US Forest Service Region:</label>
+                            <select name="region-choice" id="region-choice">
+                                <option value="" disabled selected>Regions</option>
+                            </select>
+                            <div class="map region"style="overflow: visible;">
+                                <h2>Region Map</h2>
+                                <div id="region-map" style="width:100%; height: 100%; min-width: 300px; min-height: 500px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Forest Carousel -->
+                    <div class="carousel-item forest">
+                        <div class="forest">
+                            <label for="forest-choice">Please choose a Forest:</label>
+                            <select name="forest-choice" id="forest-choice">
+                                <option value="" disabled selected>National Forests</option>
+                            </select>    
+                            <div class="map forest">
+                                <h2>Forest Map</h2>
+                                <div id="forest-map"></div>
+                            </div>  
+                        </div>            
+                    </div>
+                    <!-- District Carousel -->
+                    <div class="carousel-item district">
+                        <div class="district">
+                            <label for="district-choice">Please choose a District:</label>
+                            <select name="district-choice" id="district-choice">
+                                <option value="" disabled selected>Ranger Districts</option>
+                            </select> 
+                            <div class="map district">
+                                <h2>District Map</h2>
+                                <div id="district-map"></div>
+                            </div>     
+                        </div>              
+                    </div>
+                    <!-- Trails Carousel -->
+                    <div class="carousel-item trails">
+                        <div class="trails">
+                            <label for="trail-choice">Please choose a Trail:</label>
+                            <select name="trail-choice" id="trail-choice">
+                                <option value="" disabled selected>Trails</option>
+                            </select>
+                            <div class="map trails">
+                                <h2>Trails Map</h2>
+                                <div id="trail-map"></div>
+                            </div>
+                        </div>    
+                    </div>
+                    <!-- Final Carousel -->
+                    <div class="carousel-item final">
+                        <div class="final">
+                            <label for="trip-date">What day are you planning on visiting the trail?</label>
+                            <input type="date" id="trip-date" name="trip-start" value={{ today }} min={{ today }} max={{next_year}} required pattern="\d{4}-\d{2}-\d{2}">
+                            <label for="fire-distance"> How many miles from the trailhead do you want to check for fires?</label>
+                            <input type="text" name="fire-distance" id="fire-distance" value="25">
+                            <div class="map final">
+                                <h2>Selected Trail & Fire Map</h2>
+                                <div id="trail-and-fire-map"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="carousel-control-prev" type="button" data-bs-target="#carousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+
+                <button class="carousel-control-next" type="button" data-bs-target="#carousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+
+            </div>
+
+        </div>
+        <!-- <div class="col-7">
+            <section id="map-container">
+
+                <div class="tabs">
+                    <div class="tab region selected">Region</div>
+                    <div class="tab forest">Forest</div>
+                    <div class="tab district">District</div>
+                    <div class="tab trails">Trails</div>
+                    <div class="tab final">Result</div>
+                </div>
+
+               
+                
+                
+                <div class="map trails">
+                    <h2>Trails Map</h2>
+                    <div id="trail-map"></div>
+                </div>
+                <div class="map final">
+                    <h2>Selected Trail & Fire Map</h2>
+                    <div id="trail-and-fire-map"></div>
+                </div>
+            </section>
+        </div> -->
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <section id="trail-info">
+                <h3>HI!</h3>
+                <div id="fire-info"></div>
+                <div id="aqi-info"></div>
+                <div id="current-weather-info"></div>
+                <div id="historic-weather-info"></div>
+            </section>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <footer>
+                <h4>Fire Tracker is a Hackbright Academy Project by Maggie Barnes.</h4>
+            </footer>
+        </div>
+    </div>
+</section>
+</main>
+{% endblock %}

@@ -14,6 +14,7 @@ function generateColor() {
     return `${color}`
 }
 
+
 document.addEventListener("DOMContentLoaded", () => {
     fetch("/initialize")
         .then((response) => response.json())
