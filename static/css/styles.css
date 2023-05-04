@@ -1,0 +1,53 @@
+/* .flex {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+}
+
+
+
+main {
+    flex-direction: column;
+}
+
+.main-middle, .main-top {
+    flex-direction: row;
+}
+
+.container {
+    border: 2px solid black;
+}
+
+.left {
+    flex: 1 0 40%;
+}
+
+.right {
+    flex: 1 0 60%;
+}
+
+*/ .map {
+    min-width: 500px; 
+    min-height: 500px;
+} /*
+
+.lower {
+    flex: 1 0 100%;
+}
+
+.map.forest {
+    display: none;
+}
+
+.map.district {
+    display: none;
+}
+
+.map.trails {
+    display: none;
+}
+
+.map.trail {
+    display: none;
+} */
