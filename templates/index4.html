@@ -2,15 +2,7 @@
 
 {% block content %}
 <section class="container">
-
-    <!-- <div class="row">
-        <div class="col">
-            <header>
-                <h3>Welcome to Fire Tracker.</h3>
-            </header>
-        </div>
-    </div> -->
-
+    
     <div class="row">
         <div class="col">
             <div id="my-carousel" class="carousel slide carousel-dark" data-bs-interval="false">
@@ -25,6 +17,9 @@
                     <!-- Region -->
                     <div class="carousel-item active">
                         <div class="row justify-content-center">
+                            <h1>Step One: Choose a Region</h1>
+                        </div>
+                        <div class="row justify-content-center">
                             <div class="col-3 align-self-center">
                                 <label for="region-choice" class="hidden">Please choose a US Forest Service Region:</label>
                                 <select name="region-choice" id="region-choice">
@@ -32,7 +27,7 @@
                                 </select>
                             </div>
                             <div class="col-6">
-                                <h3>Region Map</h3>
+                                <!-- <h3>Region Map</h3> -->
                                 <div class="region map-container">
                                     <div id="region-map" class="map"></div>
                                 </div>
@@ -42,6 +37,9 @@
                     <!-- Forest -->
                     <div class="carousel-item">
                         <div class="row justify-content-center">
+                            <h1>Step Two: Choose a Forest</h1>
+                        </div>
+                        <div class="row justify-content-center">
                             <div class="col-3 align-self-center">
                                 <label for="forest-choice" class="hidden">Please choose a Forest:</label>
                                 <select name="forest-choice" id="forest-choice">
@@ -49,7 +47,7 @@
                                 </select> 
                             </div>
                             <div class="col-6">
-                                <h3>Forest Map</h3>      
+                                <!-- <h3>Forest Map</h3>       -->
                                 <div class="forest map-container">
                                     <div id="forest-map" class="map"></div>
                                 </div>  
@@ -59,6 +57,9 @@
                     <!-- District -->
                     <div class="carousel-item">
                         <div class="row justify-content-center">
+                            <div class="row justify-content-center">
+                                <h1>Step Three: Choose a District</h1>
+                            </div>
                             <div class="col-3 align-self-center">
                                 <label for="district-choice" class="hidden">Please choose a District:</label>
                                 <select name="district-choice" id="district-choice">
@@ -66,7 +67,7 @@
                                 </select>   
                             </div>
                             <div class="col-6">
-                                <h3>District Map</h3>
+                                <!-- <h3>District Map</h3> -->
                                 <div class="district map-container">
                                     <div id="district-map" class="map"></div>
                                 </div>
@@ -76,6 +77,9 @@
                     <!-- Trails -->
                     <div class="carousel-item">
                         <div class="row justify-content-center">
+                            <div class="row justify-content-center">
+                                <h1>Step Four: Choose a Trail</h1>
+                            </div>
                             <div class="col-3 align-self-center">
                                 <label for="trail-choice" class="hidden">Please choose a Trail:</label>
                                 <select name="trail-choice" id="trail-choice">
@@ -83,7 +87,7 @@
                                 </select>
                             </div>
                             <div class="col-6">
-                                <h3>Trails Map</h3>
+                                <!-- <h3>Trails Map</h3> -->
                                 <div class="trails map-container">
                                     <div id="trail-map" class="map"></div>
                                 </div>
@@ -93,21 +97,24 @@
                     <!-- Final -->
                     <div class="carousel-item final">
                         <div class="row justify-content-center">
+                            <h1>Step Five: Moment of Truth</h1>
+                        </div>
+                        <div class="row justify-content-center">
                             <div class="col-3 align-self-center">
                                 <section id="trail-info">
-                                    <label for="fire-distance"> How many miles from the trailhead do you want to check for fires?</label>
-                                    <input type="text" name="fire-distance" id="fire-distance" value="25">
-                                    <label for="trip-date">What day are you planning on visiting the trail?</label>
-                                    <input type="date" id="trip-date" name="trip-start" value={{ today }} min={{ today }} max={{next_year}} required pattern="\d{4}-\d{2}-\d{2}">
                                     <div id="fire-info"></div>
+                                    <label for="fire-distance"> If you'd like to change the search radius, enter the new radius (in miles) here:</label>
+                                    <input type="text" name="fire-distance" id="fire-distance" value="25">
                                     <div id="aqi-info"></div>
                                     <div id="weather-today"></div>
+                                    <label for="trip-date">For more weather information, please provide your anticipated trip date:</label>
+                                    <input type="date" id="trip-date" name="trip-start" value={{ today }} min={{ today }} max={{next_year}} required pattern="\d{4}-\d{2}-\d{2}">
                                     <div id="forecast-info"></div>
                                     <div id="historic-weather-info"></div>
                                 </section>
                             </div>
                             <div class="col-6">    
-                                <h3>Selected Trail & Fire Map</h3>
+                                <!-- <h3>Selected Trail & Fire Map</h3> -->
                                 <div class="final map-container">
                                     <div id="trail-and-fire-map" class="map"></div>
                                 </div>
@@ -124,6 +131,14 @@
                     <span class="visually-hidden">Next</span>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div class="row justify-content-left">
+        <div class="col">
+            <footer>
+                <img id="logo" src="static/images/Hotpot.png" alt="stylized logo of hiker with fire behind them">
+            </footer>
         </div>
     </div>
 

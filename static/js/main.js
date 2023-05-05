@@ -667,9 +667,6 @@ document.querySelector('#fire-distance').addEventListener('change', () => {
             const trailhead = data.trailhead
             const aqi = data.aqi
 
-            // Reset Map
-            document.querySelector("#trail-and-fire-map").innerHTML = ''
-
             // reset fire information
             document.querySelector('#fire-info').innerHTML = ""
 
@@ -696,6 +693,10 @@ document.querySelector('#fire-distance').addEventListener('change', () => {
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
                     `</ul`)
             }
+
+            // Reset Map
+            document.querySelector("#trail-and-fire-map").innerHTML = ''
+
 
             /* ---------- CREATE MAP ---------- */
 
