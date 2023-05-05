@@ -13,7 +13,16 @@
 }
 
 #my-carousel {
-    padding-top: 80px;
+    padding-top: 20px;
+    overflow: auto;
+    /* height: auto; */
+}
+
+.scroll {
+    width: auto;
+    height: 500px;
+    overflow-x: auto;
+    overflow-y: visible;
 }
 
 h1 {
@@ -27,7 +36,8 @@ h1 {
 
 select {
     display: inline;
-    align-items: center;
+    align-items: left;
+    width: 250px;
 }
 
 .map {

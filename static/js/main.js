@@ -448,19 +448,21 @@ document.querySelector('#trail-choice').addEventListener('input', () => {
             // provide fire info outside of map
             if (fires.length === 0){
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<h4> There are currently no fires within 25 miles of ${trail_name}. </h4>`)
+                    `<h6> There are currently no fires within 25 miles of ${trail_name}. </h6>`)
             } else if (fires.length === 1){
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<h4> There is currently one fire within 25 miles of ${trail_name}: </h4>
-                    <h4><a href=${fires[0].url}>${fires[0].name}</a></h4>
+                    `<h6> There is currently one fire within 25 miles of ${trail_name}: </h6>
+                    <h6><a href=${fires[0].url} target="popup" 
+                    onclick="window.open('${fires[0].url}','popup','width=600,height=600'); return false;">${fires[0].name}</a></h6>
                     `)
             } else {
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<h4> There are currently ${fires.length} fires within 25 miles of ${trail_name}:</h4>
+                    `<h6> There are currently ${fires.length} fires within 25 miles of ${trail_name}:</h6>
                     <ul>`)
                 for (const fire of fires){
                     document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<li><h4><a href=${fire.url}>${fire.name}</a></h4></li>`)
+                    `<li><a href=${fire.url} target="popup" 
+                    onclick="window.open('${fire.url}','popup','width=600,height=600'); return false;">${fire.name}</a></li>`)
                 }
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
                     `</ul`)
@@ -642,6 +644,12 @@ document.querySelector('#trip-date').addEventListener('input', (evt) => {
         .then((response) => response.json())
         .then((data) => {
             console.log(data)
+
+            // reset forecast & historic weather information
+
+            document.querySelector('#forecast-info').innerHTML = ""
+            document.querySelector('#historic-weather-info').innerHTML = ""
+            
             if ('current' in data) {
                 console.log(data.current)
                 document.querySelector('#forecast-info').insertAdjacentHTML("beforeend", 
@@ -675,19 +683,21 @@ document.querySelector('#fire-distance').addEventListener('change', () => {
             // provide fire info outside of map
             if (fires.length === 0){
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<h4> There are currently no fires within ${distance} miles of ${trail_name}. </h4>`)
+                    `<h6> There are currently no fires within ${distance} miles of ${trail_name}. </h6>`)
             } else if (fires.length === 1){
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<h4> There is currently one fire within 25 miles of ${trail_name}: </h4>
-                    <h4><a href=${fires[0].url}>${fires[0].name}</a></h4>
+                    `<h6> There is currently one fire within ${distance} miles of ${trail_name}: </h6>
+                    <h6><a href=${fires[0].url} target="popup" 
+                    onclick="window.open('${fires[0].url}','popup','width=600,height=600'); return false;">${fires[0].name}</a></h6>
                     `)
             } else {
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<h4> There are currently ${fires.length} fires within 25 miles of ${trail_name}:</h4>
+                    `<h6> There are currently ${fires.length} fires within ${distance} miles of ${trail_name}:</h6>
                     <ul>`)
                 for (const fire of fires){
                     document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
-                    `<li><h4><a href=${fire.url}>${fire.name}</a></h4></li>`)
+                    `<li><a href=${fire.url} target="popup" 
+                    onclick="window.open('${fire.url}','popup','width=600,height=600'); return false;">${fire.name}</a></li>`)
                 }
                 document.querySelector('#fire-info').insertAdjacentHTML("beforeend", 
                     `</ul`)

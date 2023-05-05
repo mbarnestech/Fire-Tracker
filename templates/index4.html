@@ -101,14 +101,18 @@
                         </div>
                         <div class="row justify-content-center">
                             <div class="col-3 align-self-center">
-                                <section id="trail-info">
+                                <section id="trail-info" class="scroll">
                                     <div id="fire-info"></div>
+                                    <br/>
                                     <label for="fire-distance"> If you'd like to change the search radius, enter the new radius (in miles) here:</label>
                                     <input type="text" name="fire-distance" id="fire-distance" value="25">
+                                    <br/>
                                     <div id="aqi-info"></div>
                                     <div id="weather-today"></div>
+                                    <br/>
                                     <label for="trip-date">For more weather information, please provide your anticipated trip date:</label>
                                     <input type="date" id="trip-date" name="trip-start" value={{ today }} min={{ today }} max={{next_year}} required pattern="\d{4}-\d{2}-\d{2}">
+                                    <br/>
                                     <div id="forecast-info"></div>
                                     <div id="historic-weather-info"></div>
                                 </section>
