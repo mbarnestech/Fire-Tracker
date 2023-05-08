@@ -51,9 +51,9 @@ def get_regions_list(file):
         region_info = DictReader(file, delimiter='\t')
         regions = []
         for region in region_info:
-            long, lat = helper.get_lnglat_for_place(region['Headquarters'])
-            regions.append({'region_id': region['Region'], 
-                            'region_name': region['Name'],
+            long, lat = helper.get_lnglat_for_place(region['REGIONHEADQUARTERS'])
+            regions.append({'region_id': region['REGION'], 
+                            'region_name': region['REGIONNAME'],
                             'long': long,
                             'lat': lat
                             })
