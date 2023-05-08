@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+                // map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with region map')
             });
         })
@@ -204,7 +204,7 @@ document.querySelector('#region-choice').addEventListener('input', (evt) => {
 
                 // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+                // map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with forest map')
                 
             });
@@ -309,7 +309,7 @@ document.querySelector('#forest-choice').addEventListener('input', (evt) => {
 
                 // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+                // map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with district map')
                 
             });
@@ -323,6 +323,7 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
         .then((response) => response.json())
         .then((data) => {
             const trails = data['trails'];
+            console.log(trails)
 
             // Reset Maps
             document.querySelector("#trail-map").innerHTML = ''
@@ -407,13 +408,16 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
                         }
                     });
 
+                    map.setFilter(`${trail.name}-label`, ['==', ['get', 'TRAIL_CN'], trail.id]);
+
+
                     // map.setFilter(`${trail.name}-label`, ['==', ['get', 'TRAIL_CN'], trail.id]);
                     
                 }
 
                 // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+                // map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
                 console.log('done with trail map')
                 
             });
@@ -482,7 +486,7 @@ document.querySelector('#trail-choice').addEventListener('input', () => {
                     if ('current' in data) {
                         console.log(data.current)
                         document.querySelector('#weather-today').insertAdjacentHTML("beforeend", 
-                        `<p> The weather will be ${data.current.description} today.</p>`)
+                        `<p> Today, the weather will be: ${data.current.description}.</p>`)
                     } 
             });
 
@@ -596,7 +600,7 @@ document.querySelector('#trail-choice').addEventListener('input', () => {
 
                 // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+                // map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
             });
 
             // /* ---------- CREATE TRAIL FEATURE ---------- */
@@ -653,12 +657,12 @@ document.querySelector('#trip-date').addEventListener('input', (evt) => {
             if ('current' in data) {
                 console.log(data.current)
                 document.querySelector('#forecast-info').insertAdjacentHTML("beforeend", 
-                `<p> The weather will be ${data.current.description} on ${date}.</p>`)
+                `<p> On ${date}, the weather will be: ${data.current.description}.</p>`)
             } 
             if ('historic' in data) {
                 console.log(data.historic)
                 document.querySelector('#historic-weather-info').insertAdjacentHTML("beforeend", 
-                `<p> Over the last five years, the weather on ${date.slice(5,)} has been ${data.historic.description}</p`)
+                `<p> Over the last five years, the weather on ${date.slice(5,)} has been: ${data.historic.description}.</p`)
             }
 
         });
@@ -817,7 +821,7 @@ document.querySelector('#fire-distance').addEventListener('change', () => {
 
                 // Add zoom, rotation, and full-screen controls to the map.
                 map.addControl(new mapboxgl.NavigationControl());
-                map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
+                // map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
             });
 
             // /* ---------- CREATE TRAIL FEATURE ---------- */
