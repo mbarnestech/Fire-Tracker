@@ -3,3 +3,4 @@ secret.*
 env
 testcode
 .env
+seed_data
