@@ -599,35 +599,35 @@ document.querySelector('#trail-choice').addEventListener('input', () => {
                 map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
             });
 
-            /* ---------- CREATE TRAIL FEATURE ---------- */
+            // /* ---------- CREATE TRAIL FEATURE ---------- */
 
-            // create connected line of all trailpoint coordinates
-            map.on('load', () => {
-                console.log("OH HI I'M LOADING")
-                // adding the coordinates for the line to use
-                map.addSource('route', {
-                    'type': 'geojson',
-                    'data': `/trail.geojson${trail}`
-                });
-                // adding the line itself
-                console.log(trail_name)
-                const newColor = generateColor()
-                console.log(newColor)
-                map.addLayer({
-                    'id': 'trail-route',
-                    'type': 'line',
-                    'source': 'route',
-                    'layout': {
-                        'line-join': 'round',
-                        'line-cap': 'round'
-                    },
-                    'paint': {
-                        'line-color': newColor,
-                        'line-width': 10
-                    },
-                });
-                console.log(map.getLayer('trail-route'))
-                });
+            // // create connected line of all trailpoint coordinates
+            // map.on('load', () => {
+            //     console.log("OH HI I'M LOADING")
+            //     // adding the coordinates for the line to use
+            //     map.addSource('route', {
+            //         'type': 'geojson',
+            //         'data': `/trail.geojson${trail}`
+            //     });
+            //     // adding the line itself
+            //     console.log(trail_name)
+            //     const newColor = generateColor()
+            //     console.log(newColor)
+            //     map.addLayer({
+            //         'id': 'trail-route',
+            //         'type': 'line',
+            //         'source': 'route',
+            //         'layout': {
+            //             'line-join': 'round',
+            //             'line-cap': 'round'
+            //         },
+            //         'paint': {
+            //             'line-color': newColor,
+            //             'line-width': 10
+            //         },
+            //     });
+                // console.log(map.getLayer('trail-route'))
+                // });
 
       
         });
@@ -649,7 +649,7 @@ document.querySelector('#trip-date').addEventListener('input', (evt) => {
 
             document.querySelector('#forecast-info').innerHTML = ""
             document.querySelector('#historic-weather-info').innerHTML = ""
-            
+
             if ('current' in data) {
                 console.log(data.current)
                 document.querySelector('#forecast-info').insertAdjacentHTML("beforeend", 
@@ -820,35 +820,35 @@ document.querySelector('#fire-distance').addEventListener('change', () => {
                 map.addControl(new mapboxgl.FullscreenControl({container: document.querySelector('body')}));
             });
 
-            /* ---------- CREATE TRAIL FEATURE ---------- */
+            // /* ---------- CREATE TRAIL FEATURE ---------- */
 
-            // create connected line of all trailpoint coordinates
-            map.on('load', () => {
-                console.log("OH HI I'M LOADING")
-                // adding the coordinates for the line to use
-                map.addSource('route', {
-                    'type': 'geojson',
-                    'data': `/trail.geojson${trail}`
-                });
-                // adding the line itself
-                console.log(trail_name)
-                const newColor = generateColor()
-                console.log(newColor)
-                map.addLayer({
-                    'id': 'trail-route',
-                    'type': 'line',
-                    'source': 'route',
-                    'layout': {
-                        'line-join': 'round',
-                        'line-cap': 'round'
-                    },
-                    'paint': {
-                        'line-color': newColor,
-                        'line-width': 10
-                    },
-                });
-                console.log(map.getLayer('trail-route'))
-                });
+            // // create connected line of all trailpoint coordinates
+            // map.on('load', () => {
+            //     console.log("OH HI I'M LOADING")
+            //     // adding the coordinates for the line to use
+            //     map.addSource('route', {
+            //         'type': 'geojson',
+            //         'data': `/trail.geojson${trail}`
+            //     });
+            //     // adding the line itself
+            //     console.log(trail_name)
+            //     const newColor = generateColor()
+            //     console.log(newColor)
+            //     map.addLayer({
+            //         'id': 'trail-route',
+            //         'type': 'line',
+            //         'source': 'route',
+            //         'layout': {
+            //             'line-join': 'round',
+            //             'line-cap': 'round'
+            //         },
+            //         'paint': {
+            //             'line-color': newColor,
+            //             'line-width': 10
+            //         },
+            //     });
+                // console.log(map.getLayer('trail-route'))
+                // });
 
       
         });
