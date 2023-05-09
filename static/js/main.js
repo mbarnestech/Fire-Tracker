@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 container: 'region-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
                 center: [-98.5833, 39.8333], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 4 // starting zoom
+                zoom: 3 // starting zoom
                 });
             
             // resize map on render
@@ -253,7 +253,7 @@ document.querySelector('#forest-choice').addEventListener('input', (evt) => {
                 container: 'district-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
                 center: data['startingLngLat'], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 8 // starting zoom
+                zoom: 7.5 // starting zoom
                 });
             
             // resize map on render
@@ -354,7 +354,7 @@ document.querySelector('#district-choice').addEventListener('input', (evt) => {
                 container: 'trail-map', // container ID
                 style: 'mapbox://styles/mapbox/outdoors-v12', // style URL
                 center: data['startingLngLat'], // starting position [lng, lat] (geographic center of US, 39°50′N 98°35′W, according to https://en.wikipedia.org/wiki/Geographic_center_of_the_United_States)
-                zoom: 10 // starting zoom
+                zoom: 8 // starting zoom
                 });
             
             // resize map on render
@@ -661,8 +661,16 @@ document.querySelector('#trip-date').addEventListener('input', (evt) => {
             } 
             if ('historic' in data) {
                 console.log(data.historic)
-                document.querySelector('#historic-weather-info').insertAdjacentHTML("beforeend", 
-                `<p> Over the last five years, the weather on ${date.slice(5,)} has been: ${data.historic.description}.</p`)
+                if (data.historic.description.length == 2){
+                    document.querySelector('#historic-weather-info').insertAdjacentHTML("beforeend", 
+                    `<p> Over the last five years, the weather on ${date.slice(5,)} has been: ${data.historic.description[0]} and ${data.historic.description[1]}.</p`)
+                } else if (data.historic.description.length == 3){
+                    document.querySelector('#historic-weather-info').insertAdjacentHTML("beforeend", 
+                    `<p> Over the last five years, the weather on ${date.slice(5,)} has been: ${data.historic.description[0]}, ${data.historic.description[1]}, and ${data.historic.description[2]}.</p`)
+                } else {
+                    document.querySelector('#historic-weather-info').insertAdjacentHTML("beforeend", 
+                    `<p> Over the last five years, the weather on ${date.slice(5,)} has been: ${data.historic.description}.</p`)
+                }
             }
 
         });
