@@ -1,4 +1,4 @@
-Hello, and welcome to my Fire Tracker project!
+### Hello, and welcome to my Fire Tracker project!
 
 I love to play in the mountains, but where I live in the southwest I often need to check for fires before I head out for a hike. This app helps me choose a hike on US Forest Service lands and then lets me know if there are any fires nearby (with links to their inciweb information if there are). Further, this app lets me know the current AQI and weather at the trailhead, and I can choose an anticipated hiking date to get a weather forecast and historical weather data for that date.
 
@@ -25,3 +25,6 @@ APIs: Open Weather One Call API 3.0, Open Weather Air Pollution API
 - check for other things near the trail, like iNaturalist sightings
 - get trails from non-forest service sources
 
+### About the Author
+
+Margaret Barnes developed this app as part of a software engineering fellowship with Hackbright Academy. You can learn more about her at https://www.linkedin.com/in/mbarnestech/
