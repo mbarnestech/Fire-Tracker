@@ -23,7 +23,7 @@ APIs: Open Weather One Call API 3.0, Open Weather Air Pollution API
 ### Next features?
 
 - user login with saved searches
-- twilio alert if a fire appears near a planned hike
+- Twilio alert if a fire appears near a planned hike
 - check for other things near the trail, like iNaturalist sightings
 - get trails from non-forest service sources
 
