@@ -15,7 +15,9 @@ I love to play in the mountains, but where I live in the southwest I often need 
 ### Technologies: 
 
 Python Libraries: bs4, csv, datetime, dotenv, flask, flask_sqlalchemy, geojson, jinja2, os, re,  requests, time
+
 JS Library: Mapbox GL JS
+
 APIs: Open Weather One Call API 3.0, Open Weather Air Pollution API
 
 ### Next features?
